@@ -1,5 +1,4 @@
-(** Basic adder/subtractor components *)
-
+(** Single bit adder/subtractor components *)
 module Make(B : HardCaml.Comb.S) : sig
 
   (** full adder (3 to 2 compressor) *)
@@ -8,7 +7,7 @@ module Make(B : HardCaml.Comb.S) : sig
   (** half adder *)
   val ha : B.t -> B.t -> B.t * B.t
 
-  (** 1 bit subtractor *)
+  (** subtractor *)
   val fs : B.t -> B.t -> B.t -> B.t * B.t
 
 end

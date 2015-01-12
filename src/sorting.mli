@@ -15,7 +15,40 @@
   - configure the sorts direction (invert the compare operation)
   - sort arbirary data according to some key
 
-  The networks require the inputs be a power of two.
+  {4 Idea; number of elements to sort}
+
+  The network structure requires the number of elements to sort is
+  a power of two.
+  
+  An easy way to get round this limitiation is pad an arbitrary
+  length list with the maximum value to the nearest power of 2 length,
+  then drop these values from the output (since they always will be 
+  sorted to the top of the list).  Because these values are then
+  unreferenced a portion of the network will get removed automatically.
+
+  That said a potentially large number of internal nodes will still be
+  left behind and we know something about them - they are bigger than
+  all the other values being sorted.  We could therefore encode
+  this into the data being sorted with an option data type where none 
+  represents a value bigger than all others;
+
+{[
+  type t = data_type option
+]}
+
+  and a compare function
+
+{[
+  let compare_swap dir a b = 
+    match dir, a, b with
+    | _, None, None -> a,b
+    | Up, None, Some d | _, Some d, None -> Some d, None
+    | Down, None, Some d | _, Some d, None -> None, Some d
+    | .... (* and so on *)
+]}
+
+  It would be very interesting to see if this could evaluate an optimal sorting
+  network.
 
  *)
 

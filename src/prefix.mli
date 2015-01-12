@@ -1,3 +1,4 @@
+(** Parallel prefix networks *)
 
 type 'a f = ('a -> 'a -> 'a) -> 'a list -> 'a list
 

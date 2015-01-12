@@ -1,6 +1,8 @@
-(* array of taps for maximum length LFSRs of length 2 .. 168 *)
+(** Linear feedback shift registers *)
 
+(* array of taps for maximum length LFSRs of length 2 .. 168 *)
 val taps : int list array
+
 (* create taps counterpart *)
 val counterpart : int list -> int list
 

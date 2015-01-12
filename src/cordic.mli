@@ -1,3 +1,5 @@
+(** Coordinate rotation dIgitial computer *)
+
 val pi : float
 module Hardware :
   functor (B : HardCaml.Comb.S) ->
