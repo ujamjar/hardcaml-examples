@@ -1,4 +1,6 @@
-<src/*.{ml,mli}>: syntax(camlp4o), package(hardcaml,hardcaml.syntax)
+<{src,app}/*.{ml,mli}>: syntax(camlp4o), package(hardcaml,hardcaml.syntax)
 <src/*.cmx>: for-pack(HardCamlExamples)
+<app/*.byte>: package(hardcaml)
 <src>: include
+<app>: include
 

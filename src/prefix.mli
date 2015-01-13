@@ -2,17 +2,24 @@
 
 type 'a f = ('a -> 'a -> 'a) -> 'a list -> 'a list
 
-(** simple serial prefix structure.  used for testing *)
+(** Simple serial prefix structure.  Used for testing *)
 val serial : 'a f
 
-(** Sklansky's parallel prefix structure.  high fanout *)
+(** Sklansky's parallel prefix structure.  High fanout *)
 val sklansky : 'a f
 
-(** Brent-Kung parallel prefix structure.  lower fanout, more hardware *)
+(** Brent-Kung parallel prefix structure.  Lower fanout, more hardware *)
 val brent_kung : 'a f
 
-(** Kooge-Stone parallell prefix structure.  Large but fast *)
+(** Kooge-Stone parallel prefix structure.  Large but fast *)
 val kogge_stone : 'a f
+
+(** [to_dot print_string kogge_stone 8] generates a dot file for graphviz 
+    showing the networks structure for a particular number of inputs.  
+    View with [dot file.dot -Tx11]. *)
+val to_dot : (string -> unit) -> 
+  ([ `input of int | `node of 'a * 'a * int | `output of 'a * int ] as 'a) f -> 
+  int -> unit
 
 (** Parallel prefix adder *)
 module Adder(B : HardCaml.Comb.S) : sig

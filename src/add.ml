@@ -17,5 +17,12 @@ module Make(B : HardCaml.Comb.S) = struct
     let b = ( (~: x) &: (y |: z) ) |: (x &: y &: z) in
     b, s
 
+  let carry_ripple x y cin = 
+    let c, s = List.fold_left2 
+      (fun (c,s) x y -> let c',s' = fa x y c in c',s'::s)
+      (cin,[]) (List.rev (bits x)) (List.rev (bits y))
+    in
+    concat (c::s)
+
 end
 

@@ -58,6 +58,50 @@ let kogge_stone (+:) l =
   in
   b (l' / 2) l
 
+let to_dot os network n = 
+  let module S = Set.Make(struct type t = int let compare = compare end) in
+  let n_nodes = ref 0 in
+  let id = fun () -> incr n_nodes; !n_nodes-1 in
+  let (+:) a b = `node(a, b, id()) in
+  let input i = `input(i) in
+  let outputs = List.mapi (fun i s -> `output(s, i)) 
+    (network (+:) (Array.to_list (Array.init n input))) 
+  in
+  let str = function
+    | `output(s, i) -> "o"^string_of_int i
+    | `node(_, _, i) -> "n"^string_of_int i
+    | `input(i) -> "i"^string_of_int i
+  in
+  let conn a b = os ("  " ^ str a ^ " -- " ^ str b ^ ";\n") in
+  let rec traverse set x = 
+    match x with
+    | `output(s, i) -> 
+        conn x s; traverse set s
+    | `node(a, b, i) -> 
+        if S.exists ((=) i) set then set
+        else begin
+          conn x a; conn x b; 
+          let set = S.add i set in
+          let set = traverse set a in
+          let set = traverse set b in
+          set
+        end
+    | `input(i) -> set
+  in
+  os "graph prefix_network {\n";
+  os "  rankdir=BT;\n";
+  for i=0 to n-1 do
+    os ("  i" ^ string_of_int i ^ " [shape=box];\n");
+    os ("  o" ^ string_of_int i ^ " [shape=box];\n")
+  done;
+  for i=0 to !n_nodes-1 do
+    os ("  n" ^ string_of_int i ^ " [shape=circle];\n")
+  done;
+  os "  {rank=same; "; for i=0 to n-1 do os ("i" ^ string_of_int i ^ " ") done; os "}\n";
+  os "  {rank=same; "; for i=0 to n-1 do os ("o" ^ string_of_int i ^ " ") done; os "}\n";
+  let _ = List.fold_left traverse S.empty outputs in
+  os "}\n"
+
 module Adder(B : HardCaml.Comb.S) = struct
 
   module A = Add.Make(B)

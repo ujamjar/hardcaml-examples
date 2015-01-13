@@ -51,26 +51,8 @@ val rac :
   en:t -> ld:t -> last:t -> 
   coefs:coef list -> x:t list -> t
 
-(** {2 RAC interface} *)
+(** {2 RAC design } *)
 
-(** RAC configuration *)
-module type Params = sig
-  val xbits : int
-  val accbits : int
-  val romshift : int
-  val coefs : coef list
-end
-
-(** Construct RAC with input/output interfaces *)
-module Make(P : Params) : sig
-  (** input interface *)
-  module I : interface en ld last x{} end
-
-  (** output interface *)
-  module O : interface q end
-
-  (** ROM-accumulator *)
-  val f : t I.t -> t O.t
-end
+module Design : Framework.Design
 
 

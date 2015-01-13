@@ -1,4 +1,3 @@
-(* todo *)
 open HardCaml
 
 module C = Bits.Comb.IntbitsList
@@ -59,36 +58,73 @@ let rac ~accbits ~romshift ~en ~ld ~last ~coefs ~x =
         (mux2 last (acc -: coef) (acc +: coef))
     )
 
-(* generate the interface to the rac *)
-module type Params = sig
-  val xbits : int
-  val accbits : int
-  val romshift : int
-  val coefs : coef list
-end
+module Design = struct
 
-module Make(P : Params) = struct
-  let n_coefs = List.length P.coefs 
+  open Framework
 
-  module I = interface
-    en[1] ld[1] last[1] x{n_coefs}[P.xbits]
+  let name = "RAC"
+  let desc = "ROM-accumulator using distributed arithmetic"
+  
+  module Hw_config = struct
+    open Param
+    module C = interface xbits accbits romshift n_coefs end
+    let params = C.{ 
+      xbits=Int 16; 
+      accbits=Int 20; 
+      romshift=Int 0;
+      n_coefs=Int 4;
+    }
+    let desc = C.{
+      xbits = "input width";
+      accbits = "accumulator width";
+      romshift = "rom shift";
+      n_coefs = "number of coefficients";
+    }
+    let validate _ = None
+  end
+
+  module Tb_config = struct
+    module C = Interface.Empty
+    let params = Interface.Empty.None
+    let desc = Interface.Empty.None
+    let validate _ = None
   end
   
-  module O = interface
-    q[P.accbits]
+  module Make
+    (B : Comb.S)
+    (H : Params with type 'a C.t = 'a Hw_config.C.t)
+    (T : Params with type 'a C.t = 'a Tb_config.C.t) = struct
+    
+    (* get configuration parameters *)
+    open Param
+    let xbits = get_int H.params.Hw_config.C.xbits
+    let accbits = get_int H.params.Hw_config.C.accbits
+    let romshift = get_int H.params.Hw_config.C.romshift
+    let n_coefs = get_int H.params.Hw_config.C.n_coefs
+
+    (* declare interfaces *)
+    module I = interface
+      en[1] ld[1] last[1] x{n_coefs}[xbits]
+    end
+    
+    module O = interface
+      q[accbits]
+    end
+
+    (* hardware design *)
+    let hw i =
+      let coefs = List.map (C.consti 8) [ 12;13;56;4 ] in (* XXX *)
+      {
+        O.q = 
+          rac ~accbits:accbits ~romshift:romshift 
+            ~en:i.I.en ~ld:i.I.ld ~last:i.I.last ~coefs:coefs ~x:i.I.x
+      }
+
+    (* testbench *)
+    let tb sim i o = ()
+
   end
 
-  let f i = 
-    {
-      O.q = 
-        rac ~accbits:P.accbits ~romshift:P.romshift 
-          ~en:i.I.en ~ld:i.I.ld ~last:i.I.last ~coefs:P.coefs ~x:i.I.x
-    }
-
-end
-
-module Test = struct
-  (* todo... *)
 end
 
 
