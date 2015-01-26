@@ -150,3 +150,71 @@ struct
 
 end
 
+module Design = struct
+  open HardCaml
+  open Framework
+  open Param
+
+  let name = "mult"
+  let desc = "**_Wallace_ and _Dadda_ tree multipliers**"
+
+  module Hw_config = struct
+    include interface bits multiplier end
+    let params = {
+      bits = Int 8, "Data width";
+      multiplier = Symbol(["wallace"; "dadda"], "wallace"), 
+        "Type of multiplier";
+    }
+  end
+
+  module Tb_config = struct
+    include interface cycles end
+    let params = {
+      cycles = Int 10, "Number of cycles to test";
+    }
+  end
+
+  let validate hw tb = Ok
+
+  module Make
+    (B : Comb.S)
+    (H : Params with type 'a t = 'a Hw_config.t)
+    (T : Params with type 'a t = 'a Tb_config.t) = struct
+
+    open Hw_config
+    open Tb_config
+    let bits = get_int H.params.bits
+    let multiplier = get_string H.params.multiplier
+    let cycles = get_int T.params.cycles
+
+    module I = interface da[bits] db[bits] end
+    module O = interface q[bits] end
+
+    module Mul = Make(Signal.Comb)
+    let mul = 
+      match multiplier with
+      | "wallace" -> Mul.wallace
+      | "dadda" -> Mul.dadda
+      | _ -> failwith "bad multiplier"
+
+    let wave_cfg = Some(I.(to_list (map Display.uint t)) @ 
+                        O.(to_list (map Display.uint t)))
+  
+    let hw i = O.{ q = mul i.I.da i.I.db }
+
+    let tb sim i o = 
+      let open I in
+      let open O in
+      let module S = Cyclesim.Api in
+      S.reset sim;
+      for j=0 to cycles-1 do
+        i.I.da := B.srand bits;
+        i.I.db := B.srand bits;
+        S.cycle sim;
+      done
+
+  end
+
+end
+
+

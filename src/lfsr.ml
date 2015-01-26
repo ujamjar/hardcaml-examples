@@ -99,4 +99,82 @@ module Make(B : S) = struct
 
 end
 
+module Design = struct
+
+  open HardCaml
+  open Framework
+  open Param
+
+  let name = "LFSR"
+  let desc = "Linear Feedback Shift Register"
+
+  module Hw_config = struct
+    include interface bits structure xnor counterpart end
+    let params = {
+      bits = Int 8, "LFSR width";
+      structure = Symbol(["fibonacci"; "galois"], "fibonacci"), "LFSR structure";
+      xnor = Flag false, "Build with XNOR rather then XOR gates";
+      counterpart = Flag false, "Create counterpart tap structure";
+    }
+  end
+
+  module Tb_config = struct
+    include interface cycles end
+    let params = {
+      cycles = Int 10, "Number of cycles to test";
+    }
+  end
+
+  let validate hw tb = 
+    gt hw.Hw_config.bits 1 >>
+    lt hw.Hw_config.bits 169
+
+  module Make
+    (B : Comb.S)
+    (H : Params with type 'a t = 'a Hw_config.t)
+    (T : Params with type 'a t = 'a Tb_config.t) = struct
+
+    open Hw_config
+    open Tb_config
+    let bits = get_int H.params.bits
+    let structure = get_string H.params.structure
+    let xnor = get_bool H.params.xnor
+    let counterpt = get_bool H.params.counterpart
+    let cycles = get_int T.params.cycles
+
+    module I = interface d[bits] end
+    module O = interface q[bits] end
+
+    let wave_cfg = None
+  
+    module F = Fibonacci(Signal.Comb)
+    module G = Galois(Signal.Comb)
+
+    let hw i = 
+      let lfsr = 
+        if structure = "galois" then G.lfsr
+        else F.lfsr
+      in
+      let op = 
+        let open Signal.Comb in
+        if xnor then (fun a b -> ~: (a ^: b))
+        else (^:)
+      in
+      let taps = if counterpt then counterpart taps.(bits) else taps.(bits) in
+      O.{ q = lfsr op taps i.I.d }
+
+    let tb sim i o = 
+      let open I in
+      let open O in
+      let module S = Cyclesim.Api in
+      S.reset sim;     
+      i.d := B.consti bits (if xnor then 0 else 1);
+      for j=0 to cycles - 1 do
+        S.cycle sim;
+        i.d := !(o.q);
+      done
+
+  end
+
+end
 

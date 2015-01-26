@@ -45,3 +45,4 @@ module Make(B : HardCaml.Comb.S) : sig
   val dadda : B.t -> B.t -> B.t
 end
 
+module Design : Framework.Design

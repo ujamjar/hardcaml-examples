@@ -1,8 +1,12 @@
+.PHONY: apps clean doc
+
 _build/HardCamlExamples.cma:
 	ocamlbuild -use-ocamlfind HardCamlExamples.cma
 
-hcrac.byte:
-	ocamlbuild -use-ocamlfind hcrac.byte
+apps:
+	ocamlbuild -use-ocamlfind \
+		hcrac.byte hcsort.byte hcprefix.byte \
+		hcmul.byte hclfsr.byte hccordic.byte
 
 doc:
 	ocamlbuild -use-ocamlfind $(BUILD_OPTS) HardCamlExamples.docdir/index.html

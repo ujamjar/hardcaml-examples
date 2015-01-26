@@ -36,3 +36,4 @@ module Make(B : S) : sig
 
 end
 
+module Design : Framework.Design

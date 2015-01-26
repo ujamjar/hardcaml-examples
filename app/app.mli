@@ -1,6 +1,6 @@
 (** Arg.parse parameter parser *)
 module Command_line(P : Framework.Params) : sig
-  val get : unit -> Framework.Param.t P.C.t
+  val get : unit -> Framework.Param.p P.t
   val params : (string * Arg.spec * string) list
 end
 

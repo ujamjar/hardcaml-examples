@@ -118,4 +118,90 @@ module Adder(B : HardCaml.Comb.S) = struct
 
 end
 
+module Design = struct
+  open HardCaml
+  open Framework
+  open Param
+
+  let name = "prefix"
+  let desc = "**Parallel prefix adder**
+
+Adder architectures which trade circuit area to reduce critical path.
+4 progressive larger/faster architectures are provided; _serial_, _sklansky_
+_brent-kung_ and _kogge-stone_."
+
+  module Hw_config = struct
+    include interface bits network graph end
+    let params = {
+      bits = Int 8, "Data width";
+      network = Symbol(["serial"; "sklansky"; "brent-kung"; "kogge-stone"], "sklansky"), 
+        "Type of prefix network";
+      graph = File(""), "Create graphviz representation of network";
+    }
+  end
+
+  module Tb_config = struct
+    include interface cycles end
+    let params = {
+      cycles = Int 10, "Number of cycles to test";
+    }
+  end
+
+  let validate hw tb = 
+    let open Hw_config in
+    gt hw.bits 0 >>
+    (if get_string hw.network = "kogge-stone" then pow2 hw.bits else Ok)
+
+  module Make
+    (B : Comb.S)
+    (H : Params with type 'a t = 'a Hw_config.t)
+    (T : Params with type 'a t = 'a Tb_config.t) = struct
+
+    open Hw_config
+    open Tb_config
+    let bits = get_int H.params.bits
+    let network () = 
+      match get_string H.params.network with
+      | "serial" -> serial
+      | "sklansky" -> sklansky
+      | "brent-kung" -> brent_kung
+      | "kogge-stone" -> kogge_stone
+      | _ -> failwith "not a valid network"
+    let graph = get_string H.params.graph
+    let cycles = get_int T.params.cycles
+
+    module I = interface a[bits] b[bits] cin[1] end
+    module O = interface c[bits+1] end
+
+    let wave_cfg = 
+      let open Display in
+      let i = I.(map uint t) in
+      let o = O.(map uint t) in
+      Some( I.(to_list { i with cin = bin i.cin }) @ O.(to_list o ))
+
+    let () = 
+      if graph <> "" then begin
+        let f = open_out graph in
+        to_dot (output_string f) (network()) bits;
+        close_out f
+      end
+
+    module A = Adder(Signal.Comb)
+    let hw i = O.{ c = A.add (network()) i.I.a i.I.b i.I.cin }
+
+    let tb sim i o = 
+      let open I in
+      let open O in
+      let module S = Cyclesim.Api in
+      S.reset sim;     
+      for j=0 to cycles - 1 do
+        i.a := B.srand bits;
+        i.b := B.srand bits;
+        i.cin := B.srand 1;
+        S.cycle sim;
+      done
+
+  end
+
+end
 

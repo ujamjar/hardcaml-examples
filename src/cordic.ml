@@ -354,3 +354,52 @@ struct
 
 end
 
+module Design = struct
+
+  open HardCaml
+  open Framework
+  open Param
+
+  let name = "CORDIC"
+  let desc = "CORDIC"
+
+  module Hw_config = struct
+    include interface bits end
+    let params = {
+      bits = Int 8, "CORDIC data path width"
+    }
+  end
+
+  module Tb_config = struct
+    include interface cycles end
+    let params = {
+      cycles = Int 10, "Number of cycles to test";
+    }
+  end
+
+  let validate hw tb = Ok
+
+  module Make
+    (B : Comb.S)
+    (H : Params with type 'a t = 'a Hw_config.t)
+    (T : Params with type 'a t = 'a Tb_config.t) = struct
+
+    open Hw_config
+    open Tb_config
+    let bits = get_int H.params.bits
+    let cycles = get_int T.params.cycles
+
+    module I = interface d[bits] end
+    module O = interface q[bits] end
+
+    let wave_cfg = None
+
+    let hw i = O.{ q = Signal.Comb.gnd }
+
+    let tb sim i o = ()
+
+  end
+
+end
+
+

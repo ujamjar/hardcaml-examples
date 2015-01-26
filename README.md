@@ -10,3 +10,13 @@ Lfsr    | Linear feedback shift registers
 Rac     | Rom-accumulator
 Cordic  | Trigonometry in hardware
 
+### TODO
+
+* Javascript framework implementation
+
+### Modules complete
+
+* Sorting
+* LFSR
+* Mul
+* Prefix

@@ -124,3 +124,83 @@ module OddEvenMerge(S : Swap) = struct
 
 end
 
+module Design = struct
+  open Framework
+  open Param
+
+  let name = "sorting_network"
+  let desc = "*Bitonic* and *Odd-even* merge sorting networks."
+
+  module Hw_config = struct
+    include interface bits size network pipeline end
+    let params = {
+      bits = Int 8, "Data width";
+      size = Int 8, "Size of sorting network";
+      network = Symbol(["bitonic";"odd-even"], "bitonic"), "Type of sorting network";
+      pipeline = Flag false, "Pipeline network";
+    }
+  end
+
+  module Tb_config = struct
+    include interface cycles end
+    let params = C.{ cycles = Int 32, "Number of cycles to test" }
+  end
+
+  let validate hw tb = 
+    Hw_config.(gt hw.bits 0 >> gt hw.size 1 >> pow2 hw.size) >>
+    Tb_config.(gt tb.cycles 0)
+
+  module Make
+    (B : Comb.S)
+    (H : Params with type 'a t = 'a Hw_config.t)
+    (T : Params with type 'a t = 'a Tb_config.t) = struct
+
+    open Hw_config
+    open Tb_config
+    let bits = get_int H.params.bits
+    let size = get_int H.params.size
+    let network = get_string H.params.network
+    let pipeline = get_bool H.params.pipeline
+    let cycles = get_int T.params.cycles
+
+    module I = interface d{size}[bits] end
+    module O = interface q{size}[bits] end
+
+    let wave_cfg = 
+      Some(["clock",Display.B; "clear", Display.B] @
+           I.(to_list (map Display.hex t)) @ 
+           O.(to_list (map Display.hex t)))  
+
+    let hw i = 
+      (* apply functors according to configuration *)
+      let module Swap = 
+        (val 
+          (if pipeline then 
+            (module SwapReg : Swap with type t = Signal.Comb.t) 
+          else 
+            (module SwapHw(Signal.Comb)))) 
+      in
+      let module Sort = 
+        (val
+          (if network = "bitonic" then
+            (module Bitonic(Swap) : Sort with type t = Signal.Comb.t)
+          else
+            (module OddEvenMerge(Swap))))
+      in
+      O.{ q = Sort.sort i.I.d }
+
+    let tb sim i o = 
+      let open I in
+      let open O in
+      let module S = Cyclesim.Api in
+      S.reset sim;
+      for j=0 to cycles-1 do
+        for k=0 to size-1 do
+          (List.nth i.d k) := B.srand bits;
+        done;
+        S.cycle sim;
+      done
+
+  end
+end
+

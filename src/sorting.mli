@@ -105,3 +105,8 @@ module Bitonic(S : Swap) : (Sort with type t = S.t)
 (** Odd-even merge sort *)
 module OddEvenMerge(S : Swap) : (Sort with type t = S.t)
 
+(** {2 Design} *)
+
+module Design : Framework.Design
+
+

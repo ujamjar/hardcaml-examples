@@ -61,46 +61,36 @@ let rac ~accbits ~romshift ~en ~ld ~last ~coefs ~x =
 module Design = struct
 
   open Framework
+  open Param
 
   let name = "RAC"
   let desc = "ROM-accumulator using distributed arithmetic"
   
   module Hw_config = struct
-    open Param
-    module C = interface xbits accbits romshift n_coefs end
-    let params = C.{ 
-      xbits=Int 16; 
-      accbits=Int 20; 
-      romshift=Int 0;
-      n_coefs=Int 4;
+    include interface xbits accbits romshift coefs end
+    let params = { 
+      xbits=Int 16, "input width";
+      accbits=Int 20, "accumulator width";
+      romshift=Int 0, "rom shift";
+      coefs=Int_list [0;0;0;0], "list of coefs";
     }
-    let desc = C.{
-      xbits = "input width";
-      accbits = "accumulator width";
-      romshift = "rom shift";
-      n_coefs = "number of coefficients";
-    }
-    let validate _ = None
   end
 
-  module Tb_config = struct
-    module C = Interface.Empty
-    let params = Interface.Empty.None
-    let desc = Interface.Empty.None
-    let validate _ = None
-  end
+  module Tb_config = Params_none
   
+  let validate _ _ = Ok
+
   module Make
     (B : Comb.S)
-    (H : Params with type 'a C.t = 'a Hw_config.C.t)
-    (T : Params with type 'a C.t = 'a Tb_config.C.t) = struct
+    (H : Params with type 'a t = 'a Hw_config.t)
+    (T : Params with type 'a t = 'a Tb_config.t) = struct
     
     (* get configuration parameters *)
-    open Param
-    let xbits = get_int H.params.Hw_config.C.xbits
-    let accbits = get_int H.params.Hw_config.C.accbits
-    let romshift = get_int H.params.Hw_config.C.romshift
-    let n_coefs = get_int H.params.Hw_config.C.n_coefs
+    let xbits = get_int H.params.Hw_config.xbits
+    let accbits = get_int H.params.Hw_config.accbits
+    let romshift = get_int H.params.Hw_config.romshift
+    let coefs = get_int_list H.params.Hw_config.coefs
+    let n_coefs = List.length coefs
 
     (* declare interfaces *)
     module I = interface
@@ -111,9 +101,11 @@ module Design = struct
       q[accbits]
     end
 
+    let wave_cfg = None
+
     (* hardware design *)
     let hw i =
-      let coefs = List.map (C.consti 8) [ 12;13;56;4 ] in (* XXX *)
+      let coefs = List.map (C.consti 32) coefs in (* XXX *)
       {
         O.q = 
           rac ~accbits:accbits ~romshift:romshift 
@@ -121,7 +113,14 @@ module Design = struct
       }
 
     (* testbench *)
-    let tb sim i o = ()
+    let tb sim i o = 
+      let open I in
+      let open O in
+      let module S = Cyclesim.Api in
+      S.reset sim;     
+      for j=0 to 1 do
+        S.cycle sim;
+      done
 
   end
 

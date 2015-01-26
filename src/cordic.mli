@@ -54,3 +54,6 @@ sig
   val sqrt : int -> float -> float
   val exp : int -> float -> float
 end
+
+module Design : Framework.Design
+
