@@ -1,16 +1,28 @@
-.PHONY: apps clean doc
+.PHONY: all install uninstall clean
 
-_build/HardCamlExamples.cma:
-	ocamlbuild -use-ocamlfind HardCamlExamples.cma
+all: setup.data
+	ocaml setup.ml -build
 
-apps:
-	ocamlbuild -use-ocamlfind \
-		hcrac.byte hcsort.byte hcprefix.byte \
-		hcmul.byte hclfsr.byte hccordic.byte
+setup.ml:
+	oasis setup
 
-doc:
-	ocamlbuild -use-ocamlfind $(BUILD_OPTS) HardCamlExamples.docdir/index.html
+setup.data: setup.ml
+	ocaml setup.ml -configure
+
+install: all
+	ocaml setup.ml -install
+
+uninstall:
+	ocaml setup.ml -uninstall
 
 clean:
-	ocamlbuild -use-ocamlfind -clean
-	-rm -fr HardCamlExamples.docdir
+	ocaml setup.ml -clean
+	find . -name "*~" | xargs rm -f
+
+js:
+	ocamlbuild -use-ocamlfind \
+		hcjssort.byte hcwwsort.byte 
+	js_of_ocaml +nat.js hcjssort.byte
+	js_of_ocaml +nat.js hcwwsort.byte
+
+

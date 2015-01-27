@@ -1,6 +1,105 @@
-<{src,app}/*.{ml,mli}>: syntax(camlp4o), package(hardcaml,hardcaml.syntax,str,hardcaml-waveterm.lterm,omd)
-<src/*.cmx>: for-pack(HardCamlExamples)
-<app/*.byte>: package(hardcaml,str,hardcaml-waveterm.lterm,omd)
-<src>: include
-<app>: include
-true: debug
+# OASIS_START
+# DO NOT EDIT (digest: beb544baefae3bef2e4d9b4e7e8114a5)
+# Ignore VCS directories, you can use the same kind of rule outside
+# OASIS_START/STOP if you want to exclude directories that contains
+# useless stuff for the build process
+true: annot, bin_annot
+<**/.svn>: -traverse
+<**/.svn>: not_hygienic
+".bzr": -traverse
+".bzr": not_hygienic
+".hg": -traverse
+".hg": not_hygienic
+".git": -traverse
+".git": not_hygienic
+"_darcs": -traverse
+"_darcs": not_hygienic
+# Library HardCamlExamples
+"src/HardCamlExamples.cmxs": use_HardCamlExamples
+"src/framework.cmx": for-pack(HardCamlExamples)
+"src/add.cmx": for-pack(HardCamlExamples)
+"src/sorting.cmx": for-pack(HardCamlExamples)
+"src/rac.cmx": for-pack(HardCamlExamples)
+"src/cordic.cmx": for-pack(HardCamlExamples)
+"src/prefix.cmx": for-pack(HardCamlExamples)
+"src/mul.cmx": for-pack(HardCamlExamples)
+"src/lfsr.cmx": for-pack(HardCamlExamples)
+<src/*.ml{,i,y}>: pkg_hardcaml
+<src/*.ml{,i,y}>: pkg_hardcaml.syntax
+# Executable hcsort
+<app/hcsort.{native,byte}>: pkg_hardcaml
+<app/hcsort.{native,byte}>: pkg_hardcaml-waveterm.lterm
+<app/hcsort.{native,byte}>: pkg_hardcaml.syntax
+<app/hcsort.{native,byte}>: pkg_omd
+<app/hcsort.{native,byte}>: pkg_str
+<app/hcsort.{native,byte}>: use_HardCamlExamples
+<app/hcsort.{native,byte}>: custom
+# Executable hcmul
+<app/hcmul.{native,byte}>: pkg_hardcaml
+<app/hcmul.{native,byte}>: pkg_hardcaml-waveterm.lterm
+<app/hcmul.{native,byte}>: pkg_hardcaml.syntax
+<app/hcmul.{native,byte}>: pkg_omd
+<app/hcmul.{native,byte}>: pkg_str
+<app/hcmul.{native,byte}>: use_HardCamlExamples
+<app/hcmul.{native,byte}>: custom
+# Executable hclfsr
+<app/hclfsr.{native,byte}>: pkg_hardcaml
+<app/hclfsr.{native,byte}>: pkg_hardcaml-waveterm.lterm
+<app/hclfsr.{native,byte}>: pkg_hardcaml.syntax
+<app/hclfsr.{native,byte}>: pkg_omd
+<app/hclfsr.{native,byte}>: pkg_str
+<app/hclfsr.{native,byte}>: use_HardCamlExamples
+<app/hclfsr.{native,byte}>: custom
+# Executable hcprefix
+<app/hcprefix.{native,byte}>: pkg_hardcaml
+<app/hcprefix.{native,byte}>: pkg_hardcaml-waveterm.lterm
+<app/hcprefix.{native,byte}>: pkg_hardcaml.syntax
+<app/hcprefix.{native,byte}>: pkg_omd
+<app/hcprefix.{native,byte}>: pkg_str
+<app/hcprefix.{native,byte}>: use_HardCamlExamples
+<app/hcprefix.{native,byte}>: custom
+# Executable hcrac
+<app/hcrac.{native,byte}>: pkg_hardcaml
+<app/hcrac.{native,byte}>: pkg_hardcaml-waveterm.lterm
+<app/hcrac.{native,byte}>: pkg_hardcaml.syntax
+<app/hcrac.{native,byte}>: pkg_omd
+<app/hcrac.{native,byte}>: pkg_str
+<app/hcrac.{native,byte}>: use_HardCamlExamples
+<app/hcrac.{native,byte}>: custom
+# Executable hccordic
+<app/hccordic.{native,byte}>: pkg_hardcaml
+<app/hccordic.{native,byte}>: pkg_hardcaml-waveterm.lterm
+<app/hccordic.{native,byte}>: pkg_hardcaml.syntax
+<app/hccordic.{native,byte}>: pkg_omd
+<app/hccordic.{native,byte}>: pkg_str
+<app/hccordic.{native,byte}>: use_HardCamlExamples
+<app/*.ml{,i,y}>: pkg_hardcaml
+<app/*.ml{,i,y}>: pkg_hardcaml-waveterm.lterm
+<app/*.ml{,i,y}>: pkg_hardcaml.syntax
+<app/*.ml{,i,y}>: pkg_omd
+<app/*.ml{,i,y}>: pkg_str
+<app/*.ml{,i,y}>: use_HardCamlExamples
+<app/hccordic.{native,byte}>: custom
+# Executable hcjssort
+"js/hcjssort.byte": pkg_hardcaml
+"js/hcjssort.byte": pkg_hardcaml-waveterm
+"js/hcjssort.byte": pkg_hardcaml.syntax
+"js/hcjssort.byte": pkg_js_of_ocaml
+"js/hcjssort.byte": pkg_js_of_ocaml.syntax
+"js/hcjssort.byte": use_HardCamlExamples
+"js/hcjssort.byte": custom
+# Executable hcwwsort
+"js/hcwwsort.byte": pkg_hardcaml
+"js/hcwwsort.byte": pkg_hardcaml-waveterm
+"js/hcwwsort.byte": pkg_hardcaml.syntax
+"js/hcwwsort.byte": pkg_js_of_ocaml
+"js/hcwwsort.byte": pkg_js_of_ocaml.syntax
+"js/hcwwsort.byte": use_HardCamlExamples
+<js/*.ml{,i,y}>: pkg_hardcaml
+<js/*.ml{,i,y}>: pkg_hardcaml-waveterm
+<js/*.ml{,i,y}>: pkg_hardcaml.syntax
+<js/*.ml{,i,y}>: pkg_js_of_ocaml
+<js/*.ml{,i,y}>: pkg_js_of_ocaml.syntax
+<js/*.ml{,i,y}>: use_HardCamlExamples
+"js/hcwwsort.byte": custom
+# OASIS_STOP

@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: a73b4ffc88e719cf9ce5c2559105ff21)
+version = "0.1"
+description = "HardCaml Examples"
+requires = "hardcaml hardcaml-waveterm.lterm"
+archive(byte) = "HardCamlExamples.cma"
+archive(byte, plugin) = "HardCamlExamples.cma"
+archive(native) = "HardCamlExamples.cmxa"
+archive(native, plugin) = "HardCamlExamples.cmxs"
+exists_if = "HardCamlExamples.cma"
+# OASIS_STOP
+

@@ -1,8 +1,11 @@
+# OASIS_START
+# DO NOT EDIT (digest: 357e56730b55446575e01988f973c1d6)
 Framework
 Add
-Mul
-Prefix
 Sorting
 Rac
-Lfsr
 Cordic
+Prefix
+Mul
+Lfsr
+# OASIS_STOP
