@@ -6,11 +6,11 @@ open HardCaml
 module Command_line(P : Params) = struct
   open Param
 
-  let parse_int_list l str = 
+  let parse_list f l str = 
     try
-      l := List.map int_of_string Str.(split (regexp ",") str)
+      l := List.map f Str.(split (regexp ",") str)
     with _ ->
-      raise (Arg.Bad "Failed to read int list")
+      raise (Arg.Bad "Failed to read list")
 
   let get, params = 
     let f = 
@@ -22,7 +22,11 @@ module Command_line(P : Params) = struct
         | Symbol(c,x) -> 
             let x = ref x in (fun () -> Symbol(c,!x)), Arg.Symbol(c,(fun s -> x := s)), " "
         | Int_list(x) -> 
-            let x = ref x in (fun () -> Int_list(!x)), Arg.String(parse_int_list x), "<0,1..> "
+            let x = ref x in 
+            (fun () -> Int_list(!x)), Arg.String(parse_list int_of_string x), "<4,-1,...> "
+        | Float_list(x) -> 
+            let x = ref x in 
+            (fun () -> Float_list(!x)), Arg.String(parse_list float_of_string x), "<0.3,1.2,...> "
       ) 
     in
     
@@ -129,6 +133,11 @@ module Make(D : Design) = struct
     (fun s -> output_string file s)
 
   let wave_cfg = 
+    let str_of_fixed prec b =
+      let p = 2. ** (float_of_int prec) in
+      let i = float_of_int (B.to_sint b) in
+      string_of_float (i /. p)
+    in
     match H.wave_cfg with 
     | None -> None 
     | Some(l) -> 
@@ -137,7 +146,8 @@ module Make(D : Design) = struct
         | Display.B -> Waveterm_waves.B
         | Display.U -> Waveterm_waves.U
         | Display.S -> Waveterm_waves.S
-        | Display.H -> Waveterm_waves.H) l)
+        | Display.H -> Waveterm_waves.H
+        | Display.F prec -> Waveterm_waves.F(str_of_fixed prec)) l)
 
   let () = 
     if get_bool std_params.tb then begin

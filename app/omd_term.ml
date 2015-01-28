@@ -73,6 +73,7 @@ let text_of_md md =
       stylish [`reverse] md;
       loop tl
     in
+    let htmlentities ~md x = x in
     match md with
     | X _ :: tl ->
         loop tl

@@ -31,6 +31,7 @@ module Param : sig
     | File of string 
     | Symbol of string list * string
     | Int_list of int list
+    | Float_list of float list
   
   type p = t * string
 
@@ -39,6 +40,7 @@ module Param : sig
   val get_int : p -> int
   val get_string : p -> string
   val get_int_list : p -> int list
+  val get_float_list : p -> float list
 
   (** validation status *)
   type status = Ok | Error of string list
@@ -63,12 +65,13 @@ module Params_none : Params
 
 (** control of waveterm display *)
 module Display : sig
-  type t = B | U | S | H
+  type t = B | U | S | H | F of int
   val default : (string * 'a) -> (string * t)
   val bin : (string * 'a) -> (string * t)
   val uint : (string * 'a) -> (string * t)
   val sint : (string * 'a) -> (string * t)
   val hex : (string * 'a) -> (string * t)
+  val fixed : int -> (string * 'a) -> (string * t)
 end
 
 (** A hardware design to be plugged into the framework.

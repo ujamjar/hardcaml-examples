@@ -20,36 +20,44 @@
  
     [[ 0; a0; a1; a0+a1 ]]
 
-    The address is looked up in the rom and added to a shifted accumulator
+    Given n coefficients the required rom will be of size 2^n.
 
-    [ acc = (acc >> 1) + rom.[addr] ]
+    The address is looked up in the rom and added to (or subtracted from)
+    a shifted accumulator (subtraction happens when processing the msb of
+    the input values, otherwise addition).
+
+    The RAC can be operated in two modes which we called [integer] and [fixed].
     
-    Given n coefficients the rom will be of size 2^n.
+    In [integer] mode the coefficients and accumulator are treated as 
+    integers, the internal shift registers shift out the msb down to the 
+    lsb, and the accumulator shifts to the left.  This in turn specifies 
+    an exact result, so long as the accumulator is large enough to hold it.
+
+    In fixed mode the coefficients and accumulator are treated as fixed point
+    values, the shift regiters shift out the lsb up to the msb and the 
+    accumulator shifts to the right.
 
  *)
 
 open HardCaml
 
-(** The coefficients are represented using the shallow embedding to allow
-    arbitrary precision *)
-type coef = Bits.Comb.IntbitsList.t
-
 (** Constructs the rom from the coefficients *)
 module Rom(B : Comb.S) : sig
   (** reduce a signed value to the smallest possible precision *)
-  val norm : coef -> coef
+  val norm : B.t -> B.t
 
   (** construct the rom *)
-  val make : coef list -> B.t list
+  val make : B.t list -> B.t list
 end
 
 open Signal.Comb
 
 (** Build the rom accumulator *)
 val rac : 
+  fixed:bool ->
   accbits:int -> romshift:int -> 
-  en:t -> ld:t -> last:t -> 
-  coefs:coef list -> x:t list -> t
+  en:t -> ld:t -> addsub:t -> 
+  romcoefs:t list -> x:t list -> t
 
 (** {2 RAC design } *)
 

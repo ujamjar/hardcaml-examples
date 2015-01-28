@@ -6,6 +6,7 @@ module Param = struct
     | File of string 
     | Symbol of string list * string
     | Int_list of int list
+    | Float_list of float list
   type p = t * string
 
   let get_bool = function Flag i, _ -> i | _ -> failwith "Expecting Flag"
@@ -13,6 +14,7 @@ module Param = struct
   let get_string = 
     function String i, _ | File i, _ -> i | Symbol(_, i), _ -> i | _ -> failwith "Expecting String"
   let get_int_list = function Int_list i, _ -> i | _ -> failwith "Expecting Int_list"
+  let get_float_list = function Float_list i, _ -> i | _ -> failwith "Expecting Float_list"
 
   type status = Ok | Error of string list
  
@@ -43,12 +45,13 @@ module Params_none = struct
 end
 
 module Display = struct
-  type t = B | U | S | H
+  type t = B | U | S | H | F of int
   let default (n,_) = n,B
   let bin (n,_) = n,B
   let uint (n,_) = n,U
   let sint (n,_) = n,S
   let hex (n,_) = n,H
+  let fixed prec (n,_) = n,F prec
 end
 
 module type Design = sig
