@@ -12,8 +12,8 @@ setup.data: setup.ml
 install: all
 	ocaml setup.ml -install
 
-uninstall: setup.data
-	ocaml setup.ml -uninstall
+uninstall: 
+	ocamlfind remove hardcaml-examples
 
 clean:
 	ocaml setup.ml -clean
