@@ -1,6 +1,6 @@
 bin: [
 "hccordic.native" {hardcaml-cordic}
-"hclfsr.native" {ihclfsr}
+"hclfsr.native" {hardcaml-lfsr}
 "hcmul.native" {hardcaml-mul}
 "hcprefix.native" {hardcaml-prefix}
 "hcrac.native" {hardcaml-rac}
