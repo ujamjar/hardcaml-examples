@@ -17,16 +17,17 @@ module Command_line(P : Params) = struct
       (function
         | Flag(x) -> let x = ref x in (fun () -> Flag(!x)), Arg.Set(x), " "
         | Int(x) -> let x = ref x in (fun () -> Int(!x)), Arg.Set_int(x), "<int> "
+        | Float(x) -> let x = ref x in (fun () -> Float(!x)), Arg.Set_float(x), "<float> "
         | String(x) -> let x = ref x in (fun () -> String(!x)), Arg.Set_string(x), "<str> "
         | File(x) -> let x = ref x in (fun () -> File (!x)), Arg.Set_string(x), "<file> "
         | Symbol(c,x) -> 
             let x = ref x in (fun () -> Symbol(c,!x)), Arg.Symbol(c,(fun s -> x := s)), " "
         | Int_list(x) -> 
             let x = ref x in 
-            (fun () -> Int_list(!x)), Arg.String(parse_list int_of_string x), "<4,-1,...> "
+            (fun () -> Int_list(!x)), Arg.String(parse_list int_of_string x), "<4,-1,> "
         | Float_list(x) -> 
             let x = ref x in 
-            (fun () -> Float_list(!x)), Arg.String(parse_list float_of_string x), "<0.3,1.2,...> "
+            (fun () -> Float_list(!x)), Arg.String(parse_list float_of_string x), "<0.3,1.,> "
       ) 
     in
     

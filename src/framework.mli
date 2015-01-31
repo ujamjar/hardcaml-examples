@@ -27,6 +27,7 @@ module Param : sig
   type t =
     | Flag of bool 
     | Int of int 
+    | Float of float
     | String of string 
     | File of string 
     | Symbol of string list * string
@@ -38,6 +39,7 @@ module Param : sig
   (** get congfiguration values *)
   val get_bool : p -> bool
   val get_int : p -> int
+  val get_float : p -> float
   val get_string : p -> string
   val get_int_list : p -> int list
   val get_float_list : p -> float list

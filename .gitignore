@@ -2,3 +2,5 @@
 .*.swp
 _build/
 HardCamlExamples.docdir
+*.byte
+*.native

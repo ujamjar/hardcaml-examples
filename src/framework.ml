@@ -2,6 +2,7 @@ module Param = struct
   type t =
     | Flag of bool 
     | Int of int 
+    | Float of float
     | String of string 
     | File of string 
     | Symbol of string list * string
@@ -11,6 +12,7 @@ module Param = struct
 
   let get_bool = function Flag i, _ -> i | _ -> failwith "Expecting Flag"
   let get_int = function Int i, _ -> i | _ -> failwith "Expecting Int"
+  let get_float = function Float i, _ -> i | _ -> failwith "Expecting Float"
   let get_string = 
     function String i, _ | File i, _ -> i | Symbol(_, i), _ -> i | _ -> failwith "Expecting String"
   let get_int_list = function Int_list i, _ -> i | _ -> failwith "Expecting Int_list"

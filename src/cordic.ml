@@ -1,356 +1,235 @@
-open HardCaml
+type system = 
+  | Circular 
+  | Linear 
+  | Hyperbolic 
 
-let pi = 3.1415926535897932384626433832795
+type mode = 
+  | Rotation 
+  | Vectoring 
+  | Inverse of float
 
-module Hardware(B : Comb.S) = 
-struct
+module Double = struct
 
-  open B
+  (* (1/2) * log2 ((1+t) / (1-t)) *)
+  let atanh t = 
+    0.5 *. (log ((1.0 +. t) /. (1.0 -. t))) 
 
-  (*
-   Cordic calculation type
-
-   Cordic0 simplified cordic calculation (x is not updated)
-   Cordic1 standard cordic equation
-   Cordic2 hyperbolic
-  *)
-  type cordic_type_t =  Cordic0 | Cordic1 | Cordic2    
-
-  (*
-   Type of cordic circuit to generate
-
-   CordicComb combinatorial
-   CordicSeq Fully unrolled
-   CordicIter Iterative
-  *)
-  type cordic_gen_t = 
-      CordicComb of cordic_type_t   
-    | CordicSeq of cordic_type_t    
-    | CordicIter of cordic_type_t   
-
-  (*
-   Parameterized cordic circuit generation.
-
-   Inputs:
-     pre       Pre-rotation mode.  -1 none, 0 or 1 different rotation modes
-     cdc_type  Type of cordic to build
-     fix       fix point precision of arithmetic
-     iters     number of iterations
-     reg       register
-     vld_in    input valid signal
-     x         input data
-     y         input data
-     z         input data
-     vecmode   vectoring mode
-
-   Outputs:
-     x         output data
-     y         output data
-     z         output data
-     vld_out   output valid signal
-  *)
-
-  let cordic pre cdc_type fix iters reg vld_in x y z vecmode = 
-    let (>>+) = sra in
-
-    (* 2 to the power -i *)
-    let atan i = atan (2.0 ** (float (-i)))  in
-
-    (* (1/2) * log2 ((1+t) / (1-t)) *)
-    let atanh i = 
-      let t = (2.0 ** (float (-(i+1)))) in
-      0.5 *. (log ((1.0 +. t) /. (1.0 -. t))) 
+  (* cordic gain *)
+  let gain ~iters = 
+    let rec f i = 
+      if i=iters then 1. 
+      else sqrt (1. +. (2. ** (2. *. (float_of_int (- i))))) *. f (i+1)
     in
+    f 0
 
-    let pipeline x = 
-      match cdc_type with 
-      | CordicComb _ -> x 
-      | _ -> reg x 
+  (* cordic hyperbolic gain *)
+  let gainh ~iters = 
+    let rec f i k = 
+      if i=iters then 1. 
+      else 
+        let x = sqrt (1. -. (2. ** (2. *. (float_of_int (- i))))) in
+        x *. (if i=k then f i ((k*3)+1) else f (i+1) k)
     in
+    f 1 4
 
-    let bits = width x in
-    let scale = 2.0 ** (float_of_int (bits-fix)) in
-    let fconst f = consti bits (int_of_float (scale *. f)) in
+  let cordic ~system ~mode ~iters ~x ~y ~z = 
+    let rec iter i k x y z = 
+      (*Printf.printf "%i %i\n" i k;*)
+      if i = iters then x, y, z
+      else
+        let t = 2. ** float_of_int (-i) in
+        let m, e = 
+          match system with 
+          | Circular -> 1., atan t 
+          | Linear -> 0., t
+          | Hyperbolic -> -1., atanh t
+        in
+        let d = 
+          match mode with 
+          | Rotation -> if z < 0. then -1. else 1.
+          | Vectoring -> if y < 0. then 1. else -1.
+          | Inverse c -> if y < c then 1. else -1.
+        in
+        let x' = x -. (m *. y *. d *. t) in
+        let y' = y +. (x *. d *. t) in
+        let z' = z -. (d *. e) in
+        if system = Hyperbolic && i = k then iter i ((3*k)+1) x' y' z'
+        else iter (i+1) k x' y' z'
+    in
+    iter (if system=Hyperbolic then 1 else 0) 4 x y z  
 
-    let shift_mux hyper addr v = 
-      let range = 
-        if hyper then List.tl (Utils.range (iters+1)) 
-        else (Utils.range iters) 
+  module Fns(I : sig val iters : int end) = struct
+
+    let iters = I.iters
+    let gain = gain ~iters 
+    let gainh = gainh ~iters
+
+    let cos_sin angle = 
+      let x, y, _ = cordic ~system:Circular ~mode:Rotation ~iters 
+        ~x:(1. /. gain) ~y:0. ~z:angle 
       in
-      mux addr (List.map (fun x -> v >>+ x) range) in
+      x, y
 
-    (* iter -> index map for hyperbolic functions *)
-    let index_map iters = 
-      let rec imap i j =
-        let iters_left = iters - i in
-        if (i = iters) then []
-        else if (j > 0) && ((j mod 3) = 0) && (iters_left > 1) then
-          [ j; j ] @ imap (i+2) (j+1)
-        else 
-          [ j ] @ imap (i+1) (j+1) in
-      imap 0 0 
-    in
-
-    let prerotate0 x y z =  
-      (* XXX check this function :
-          let n = neg (mux2 d x y) this was included ... looks
-          like it was rewritten and left behind *)
-      let bits = width x in
-      let d = y <+ (zero bits) in
-      let neg x = (zero bits) -: x in
-      mux2 d (neg y) y, mux2 d x (neg x), 
-      z -: (mux2 d (fconst (pi /. 2.0)) (fconst (pi /. (-2.0)))) in
-
-    let prerotate1 x y z = 
-      let bits = width x in
-      let d = x <+ (zero bits) in
-      let neg x = (zero bits) -: x in
-      mux2 d (neg x) x, mux2 d (neg y) y, 
-      mux2 d (z -: (fconst pi)) z 
-    in
-
-    (* pre-rotation mode *)
-    let x,y,z = 
-      match pre with
-      | -1 -> x,y,z
-      |  0 -> prerotate0 x y z
-      |  1 -> prerotate1 x y z
-      | _ -> failwith "Invalid pre-rotatation mode" 
-    in
-
-    let cordic0 x y z vecmode xt yt t = 
-      let c = ( ( (vecmode >=+ (zero bits)) &: (y <+ (zero bits)) ) |:
-                ( (vecmode <+ (zero bits)) &: (z >=+ (zero bits)) ) ) 
+    let polar_to_rect mag phase = 
+      let x, y, _ = cordic ~system:Circular ~mode:Rotation ~iters 
+        ~x:(mag /. gain) ~y:0. ~z:phase 
       in
-      x, 
-      (mux2 c (y +: xt) (y -: xt)), 
-      (mux2 c (z -: t) (z +: t)) 
-    in
+      x, y
 
-    let cordic1 x y z vecmode xt yt t = 
-      let c = ( ( (vecmode >=+ (zero bits)) &: (y <+ vecmode) ) |:
-                ( (vecmode <+ (zero bits)) &: (z >=+ (zero bits)) ) ) 
+    let rotate_vector x y angle = 
+      let x, y, _ = cordic ~system:Circular ~mode:Rotation ~iters 
+        ~x ~y ~z:angle 
       in
-      (mux2 c (x -: yt) (x +: yt)), 
-      (mux2 c (y +: xt) (y -: xt)), 
-      (mux2 c (z -: t) (z +: t)) 
-    in
+      x /. gain, y /. gain
 
-    let cordic2 x y z vecmode xt yt t = 
-      let c = ( ( (vecmode >=+ (zero bits)) &: (y <+ (zero bits)) ) |: 
-                ( (vecmode <+ (zero bits)) &: (z >=+ (zero bits)) ) ) 
+    let atan a = 
+      let _, _, z = cordic ~system:Circular ~mode:Vectoring ~iters 
+        ~x:1.0 ~y:a ~z:0. 
       in
-      (mux2 c (x +: yt) (x -: yt)), 
-      (mux2 c (y +: xt) (y -: xt)), 
-      (mux2 c (z -: t) (z +: t)) 
-    in
+      z
 
-    let cordic_full cordic x y z vecmode tab hyper =
-      let imap = 
-        if hyper then (index_map iters) 
-        else (Utils.range iters) 
+    let atan2 y x = 
+      let _, _, z = cordic ~system:Circular ~mode:Vectoring ~iters 
+        ~x ~y ~z:0. 
       in
-      let rec cf i vld x y z vecmode = 
-        if i = iters then
-          (x,y,z,vld)
-        else
-          let idx = List.nth imap i in
-          let idx_sft = if hyper then idx + 1 else idx in
-          let x,y,z = 
-            cordic x y z vecmode 
-              (x >>+ idx_sft) (y >>+ idx_sft) 
-              (List.nth tab idx) 
-          in
-          let x,y,z,vld,vecmode = 
-            pipeline x, pipeline y, 
-            pipeline z, pipeline vld, 
-            pipeline vecmode 
-          in
-          cf (i+1) vld x y z vecmode 
-      in
-      cf 0 vld_in x y z vecmode in
+      z
 
-    let cordic_iter cordic ix iy iz vecmode tab hyper =
-      let bits = width ix in
-      let iter_bits = Utils.clog2 (iters-1) in
-      (* counter used to control the iteration and the rom address *)
-      let count_next = wire iter_bits in
-      let count = pipeline (mux2 vld_in (zero iter_bits) count_next) in
-      count_next <== count +: (one iter_bits);
-      (* remap count for hyperbolic functions in needed *)
-      let idx = 
-        if hyper then 
-          mux count 
-            (List.map 
-               (fun x -> consti (width count) x) 
-               (index_map iters)) 
-        else count 
+    let rect_to_polar x y = 
+      let x, _, z = cordic ~system:Circular ~mode:Vectoring ~iters 
+        ~x ~y ~z:0. 
       in
-      (* cordic circuit *)
-      let sx,sy,sz = wire bits, wire bits, wire bits in
-      let rx,ry,rz = 
-        pipeline (mux2 vld_in ix sx), 
-        pipeline (mux2 vld_in iy sy), 
-        pipeline (mux2 vld_in iz sz) 
+      x /. gain, z
+
+    let asin a = 
+      let x, y, z = cordic ~system:Circular ~mode:(Inverse (abs_float a)) ~iters 
+        ~x:(1. /. gain) ~y:0. ~z:0. 
       in
-      let nx,ny = shift_mux hyper idx rx, shift_mux hyper idx ry in 
-      let tab = mux idx tab in 
-      let cx,cy,cz = cordic rx ry rz vecmode nx ny tab in
-      sx <== cx; sy <== cy; sz <== cz; 
-      let vld_out = (count ==:. (iters-1)) in
-      cx, cy, cz, vld_out 
-    in
+      if a < 0. then z else -. z
 
-    let tab0 = 
-      List.map (fun x -> fconst (2.0 ** (float (-x)))) (Utils.range iters) 
-    in
-    let tab1 = 
-      List.map (fun x -> fconst (atan x)) (Utils.range iters) 
-    in
-    let tab2 = 
-      List.map (fun x -> fconst (atanh x)) (Utils.range iters) 
-    in
-
-    let fn, cdc, tab, hyper = 
-      let sel_cdc fn typ = 
-        match typ with 
-        | Cordic0 -> fn, cordic0, tab0, false
-        | Cordic1 -> fn, cordic1, tab1, false 
-        | Cordic2 -> fn, cordic2, tab2, true 
+    let mul a b = 
+      let x, y, z = cordic ~system:Linear ~mode:Rotation ~iters 
+        ~x:a ~y:0. ~z:b 
       in
-      match cdc_type with
-      | CordicComb cdc -> sel_cdc cordic_full cdc
-      | CordicSeq  cdc -> sel_cdc cordic_full cdc
-      | CordicIter cdc -> sel_cdc cordic_iter cdc 
-    in
+      y
 
-    fn cdc x y z vecmode tab hyper
+    let div a b =
+      let x, y, z = cordic ~system:Linear ~mode:Vectoring ~iters 
+        ~x:b ~y:a ~z:0. 
+      in
+      z
+
+    let cosh_sinh a =
+      let x, y, z = cordic ~system:Hyperbolic ~mode:Rotation ~iters 
+        ~x:(1. /. gainh) ~y:0. ~z:a
+      in
+      x, y
+
+    let atanh a = 
+      let x, y, z = cordic ~system:Hyperbolic ~mode:Vectoring ~iters 
+        ~x:1. ~y:a ~z:0.
+      in
+      z
+
+  end
 
 end
 
-module Software = 
-struct
+open HardCaml
 
-  let rec icordic0 i iters x y z vecmode = 
-    if i = iters then (x,y,z)
-    else
-      let t = (2.0 ** (float (-i))) in
-      if ((vecmode >= 0.0 && y < 0.0) || 
-          (vecmode < 0.0  && z >= 0.0)) then
-        icordic0 (i+1) iters x (y +. (x *. t)) (z -. t) vecmode
-      else 
-        icordic0 (i+1) iters x (y -. (x *. t)) (z +. t) vecmode 
+module type Fixpt = sig
+  val w : int
+  val fp : int
+end
 
-  let rec icordic1 i iters x y z vecmode = 
-    (* 2 to the power -i (not complex) *)
-    let atan i = atan (2.0 ** (float (-i))) in
-    if i = iters then (x,y,z)
-    else
-      let t = (2.0 ** (float_of_int (-i))) in
-      if ((vecmode >= 0.0 && y < vecmode) || 
-          (vecmode < 0.0  && z >= 0.0)) then
-        icordic1 (i+1) iters 
-          (x -. (y *. t)) (y +. (x *. t)) (z -. (atan i)) vecmode
-      else 
-        icordic1 (i+1) iters 
-          (x +. (y *. t)) (y -. (x *. t)) (z +. (atan i)) vecmode 
+module Unrolled(B : Comb.S)(P : Fixpt) = struct
 
-  let rec icordic2 i iters x y z vecmode = 
-    (* (1/2) * log2 ((1+t) / (1-t)) *)
-    let atanh i = 
-      let t = (2.0 ** (float (-(i+1)))) in
-      0.5 *. (log ((1.0 +. t) /. (1.0 -. t))) 
+  let rnd x = int_of_float (if x < 0. then (x -. 0.5) else (x +. 0.5))
+  let constf x = B.consti P.w (rnd (x *. (2. ** float_of_int P.fp)))
+
+  let atan iters = 
+    Array.init iters (fun i -> constf (atan (2. ** float_of_int (-i))))
+
+  (* XXX hyperbolic repetition...FIXME ? *)
+  let atanh iters = 
+    Array.init iters (fun i -> constf (Double.atanh (2. ** float_of_int (-i))))
+
+  let t iters = 
+    Array.init iters (fun i -> B.srl (constf 1.) i)
+
+  let step ~x ~y ~z ~d ~m ~i ~e = 
+    let open B in
+    let xsft = sra x i in
+    let ysft = sra y i in
+    let x' = mux2 (msb m) x (mux2 ((lsb m) ^: d) (x +: ysft) (x -: ysft)) in
+    let y' = mux2 d (y -: xsft) (y +: xsft) in
+    let z' = mux2 d (z +: e) (z -: e) in
+    x', y', z'
+
+  (* system *)
+  let circular = B.const "00"
+  let hyperbolic = B.const "01"
+  let linear = B.const "10"
+
+  (* modes *)
+  let rotation = B.const "00"
+  let vectoring = B.const "01"
+  let inverse = B.const "11"
+
+  let cordic ?pipe ~system ~mode ~iters ~c ~x ~y ~z = 
+    let open B in
+    let p = match pipe with None -> (fun p -> p) | Some(p) -> p in
+    assert (width x = width y);
+    assert (width x = width z);
+    
+    let m = system in
+    let e = [ atan iters; atanh iters; t iters ] in
+
+    let rec f i x y z = 
+      if i = iters then x, y, z
+      else
+        let e = mux system (List.map (fun e -> e.(i)) e) in
+        let d = mux mode [ z <+. 0; y >=+. 0; y >=+ c ] in
+        let x, y, z = step ~x ~y ~z ~d ~m ~i ~e:e in
+        f (i+1) (p x) (p y) (p z)
     in
-    let cdc i x y z vecmode = 
-      let t = (2.0 ** (float (-(i+1)))) in
-      if ((vecmode >= 0.0 && y < 0.0) || 
-          (vecmode < 0.0 && z >= 0.0)) then
-        x +. (y *. t), y +. (x *. t), z -. (atanh i)
-      else 
-        x -. (y *. t), y -. (x *. t), z +. (atanh i) 
-    in
-    if i = iters then (x,y,z)
-    else
-      let x,y,z = 
-        if (i > 0) && ((i mod 3) = 0) then 
-          let x, y, z = cdc i x y z vecmode in
-          cdc i x y z vecmode
-        else
-          cdc i x y z vecmode 
-      in
-      icordic2 (i+1) iters x y z vecmode 
+    f 0 x y z
 
-  let cordic0 = icordic0 0 
-  let cordic1 = icordic1 0 
-  let cordic2 = icordic2 0 
+end
 
-  let x c = let x,y,z = c in x 
-  let y c = let x,y,z = c in y 
-  let z c = let x,y,z = c in z 
+module Iterative(P : Fixpt) = struct
 
-  let invGain1 iters = 1.0 /. (x (cordic1 iters 1.0 0.0 0.0 (-1.0))) 
-  let invGain2 iters = 1.0 /. (x (cordic2 iters 1.0 0.0 0.0 (-1.0))) 
+  module C = Unrolled(Signal.Comb)(P)
+  open Signal.Comb
+  open Signal.Seq
 
-  let prerotate0 x y z = 
-    let d = if y < 0.0 then 1.0 else -1.0 in
-    -. (d *. y), (d *. x), (z -. (d *. pi /. 2.0))
+  let step ~x ~y ~z ~d ~m ~i ~e = 
+    let xsft = log_shift sra x i in
+    let ysft = log_shift sra y i in
+    let x' = mux2 (msb m) x (mux2 ((lsb m) ^: d) (x +: ysft) (x -: ysft)) in
+    let y' = mux2 d (y -: xsft) (y +: xsft) in
+    let z' = mux2 d (z +: e) (z -: e) in
+    x', y', z'
 
-  let prerotate1 x y z = 
-    let d = if x < 0.0 then -1.0 else 1.0 in
-    (d *. x), (d *. y), if x < 0.0 then z -. pi else z 
+  let cordic ~ld ~system ~mode ~iter ~c ~x ~y ~z = 
+    let iters = 1 lsl (width iter) in
 
-  (*let prerotate = prerotate0*)
-  let prerotate x y z = x,y,z
+    let atan = mux iter (Array.to_list (C.atan iters)) in
+    let atanh = mux iter (Array.to_list (C.atanh iters)) in
+    let t = mux iter (Array.to_list (C.t iters)) in
 
-  let mul iters a b = y (cordic0 iters a 0.0 b (-1.0))
+    let xw, yw, zw = wire P.w, wire P.w, wire P.w in
 
-  let div iters a b = y (cordic0 iters b a 0.0 0.0)
+    let m = system in
+    let e = mux system [ atan; atanh; t ] in
+    let d = mux mode [ zw <+. 0; yw >=+. 0; yw >=+ c ] in
 
-  let atan iters a = z (cordic1 iters 1.0 a 0.0 0.0)
+    let xs, ys, zs = step ~x:xw ~y:yw ~z:zw ~d ~m ~i:iter ~e in
 
-  let sincos iters a = 
-    let xn,yn,zn = prerotate (invGain1 iters) 0.0 a in
-    let x,y,z = cordic1 iters xn yn zn (-1.0) in
-    y, x 
+    xw <== (reg r_sync enable (mux2 ld x xs));
+    yw <== (reg r_sync enable (mux2 ld y ys));
+    zw <== (reg r_sync enable (mux2 ld z zs));
 
-  let tan iters a = 
-    let sin,cos = sincos iters a in
-    sin /. cos 
-
-  let asin iters a = 
-    let x,y,z = 
-      cordic1 iters (invGain1 iters) 0.0 0.0 
-        (if a < 0.0 then (-. a) else a) 
-    in
-    if a < 0.0 then (-. z) else z 
-
-  let magphase iters x y = 
-    let xn,yn,zn = prerotate x y 0.0 in
-    let mag,_,phase = cordic1 iters xn yn zn 0.0 in
-    mag, phase 
-
-  let polar_to_rect iters m p = 
-    let x,y,z = cordic1 iters m 0.0 p (-1.0) in
-    y, x 
-
-  let sinhcosh iters a = 
-    let x,y,z = cordic2 iters (invGain2 iters) 0.0 a (-1.0) in
-    y, x 
-
-  let tanh iters a = 
-    let sinh,cosh = sinhcosh iters a in
-    sinh /. cosh 
-
-  let atanh iters a = z (cordic2 iters 1.0 a 0.0 0.0) 
-
-  let log iters a = 2.0 *. (z (cordic2 iters (a +. 1.0) (a -. 1.0) 0.0 0.0)) 
-
-  let sqrt iters a = 
-    (invGain2 iters) *. (x (cordic2 iters (a +. 0.25) (a -. 0.25) 0.0 0.0)) 
-
-  let exp iters a = 
-    let sinh,cosh = sinhcosh iters a in
-    sinh +. cosh 
+    xw, yw, zw
 
 end
 
@@ -363,17 +242,34 @@ module Design = struct
   let name = "CORDIC"
   let desc = "CORDIC"
 
+  (* for now we dont support the 'asin' functionas it complicates the 
+     generator code.  The generic cores do support it though *)
+
   module Hw_config = struct
-    include interface bits end
+    include interface arch bits fp system mode iters funct end
     let params = {
-      bits = Int 8, "CORDIC data path width"
+      arch = Symbol(["comb"; "pipe"; "iter"], "comb"), "Combinatorial, pipelined or iterative architecture";
+      bits = Int 20, "CORDIC data path width";
+      fp = Int 16, "Fixed point";
+      system = Symbol(["generic"; "circular"; "linear"; "hyperbolic"], "generic"),
+        "Coordinate system";
+      mode = Symbol(["generic"; "rotation"; "vectoring"; "inverse"], "generic"),
+        "Rotation mode";
+      funct = Symbol(
+        [ "generic"; "cos-sin"; "polar-to-rect"; "rotate-vector"; "atan"; "atan2";
+          "rect-to-polar"; "mul"; "div"; "cosh-sinh"; "atanh" ],
+        "generic"), "Configure circuit for specific function";
+      iters = Int 16, "Max Number of iterations";
     }
   end
 
   module Tb_config = struct
-    include interface cycles end
+    include interface x y z c end
     let params = {
-      cycles = Int 10, "Number of cycles to test";
+      x = Float 0.0, "x input";
+      y = Float 0.0, "y input";
+      z = Float 0.0, "z input";
+      c = Float 0.0, "Inverse mode decision target value";
     }
   end
 
@@ -384,19 +280,210 @@ module Design = struct
     (H : Params with type 'a t = 'a Hw_config.t)
     (T : Params with type 'a t = 'a Tb_config.t) = struct
 
+    module S = Signal.Comb
     open Hw_config
     open Tb_config
+
+    let arch = get_string H.params.arch
     let bits = get_int H.params.bits
-    let cycles = get_int T.params.cycles
+    let fp = get_int H.params.fp
+    let arch = get_string H.params.arch
+    let system = get_string H.params.system
+    let mode = get_string H.params.mode
+    let funct = get_string H.params.funct
+    let iters = get_int H.params.iters
 
-    module I = interface d[bits] end
-    module O = interface q[bits] end
+    let x = get_float T.params.x
+    let y = get_float T.params.y
+    let z = get_float T.params.z
+    let c = get_float T.params.c
 
-    let wave_cfg = None
+    module I = interface enable[1] ld[1] system[2] mode[2] iter[Utils.nbits iters] c[bits] x[bits] y[bits] z[bits] end
+    module O = interface xo[bits] yo[bits] zo[bits] end
 
-    let hw i = O.{ q = Signal.Comb.gnd }
+    let wave_cfg = 
+      let open Display in
+      Some (
+        ["clock",B; "reset",B; "clear",B; "enable",B] @
+        I.(to_list (map2 (fun (n,_) d -> n,d) t 
+        {
+          enable = B;
+          ld = B;
+          system = B;
+          mode = B;
+          iter = U;
+          c = F fp;
+          x = F fp;
+          y = F fp;
+          z = F fp;
+        })) @
+      O.(to_list (map (fun (n,_) -> n,F fp) t)))
 
-    let tb sim i o = ()
+    module Fp = struct
+      let w = bits
+      let fp = fp
+    end
+    module Uc = Unrolled(Signal.Comb)(Fp)
+    module Ic = Iterative(Fp)
+
+    let constf = Uc.constf 
+    let system = 
+      match system with
+      | "circular" -> Some Uc.circular
+      | "linear" -> Some Uc.linear
+      | "hyperbolic" -> Some Uc.hyperbolic
+      | _ -> None
+    let mode = 
+      match mode with
+      | "rotation" -> Some Uc.rotation
+      | "vectoring" -> Some Uc.vectoring
+      | "inverse" -> Some Uc.inverse
+      | _ -> None
+
+    let sconst x = S.constibl (List.map B.to_int (B.bits x)) 
+    let fixed x = Uc.rnd (x *. (2. ** float_of_int fp))
+
+    let gain = Double.gain ~iters 
+    let gainh = Double.gainh ~iters 
+
+    (* configure special functions *)
+    let system, mode, x', y', z', c', xo', yo', zo' = 
+      let fx x =  `fix (B.consti bits (fixed x)) in
+      match funct with
+      | "cos-sin" -> 
+        Some Uc.circular, Some Uc.rotation, 
+        fx (1. /. gain), fx 0., `none, fx 0.,
+        `none, `none, `none
+      | "polar-to-rect" -> 
+        Some Uc.circular, Some Uc.rotation, 
+        `igain, fx 0., `none, fx 0.,
+        `none, `none, `none
+      | "rotate-vector" -> 
+        Some Uc.circular, Some Uc.rotation, 
+        `none, `none, `none, fx 0.,
+        `igain, `igain, `none
+      | "atan" -> 
+        Some Uc.circular, Some Uc.vectoring, 
+        fx 1., `none, fx 0., fx 0.,
+        `none, `none, `none
+      | "atan2" ->
+        Some Uc.circular, Some Uc.vectoring, 
+        `none, `none, fx 0., fx 0.,
+        `none, `none, `none
+      | "rect-to-polar" ->
+        Some Uc.circular, Some Uc.vectoring, 
+        `none, `none, fx 0., fx 0.,
+        `igain, `none, `none
+      | "mul" ->
+        Some Uc.linear, Some Uc.vectoring, 
+        `none, fx 0., `none, fx 0.,
+        `none, `none, `none
+      | "div" ->
+        Some Uc.linear, Some Uc.vectoring, 
+        `none, `none, fx 0., fx 0.,
+        `none, `none, `none
+      | "cosh-sinh" ->
+        Some Uc.hyperbolic, Some Uc.rotation, 
+        fx (1. /. gainh), fx 0., `none, fx 0.,
+        `none, `none, `none
+      | "atanh" ->
+        Some Uc.hyperbolic, Some Uc.vectoring, 
+        fx 1., `none, fx 0., fx 0.,
+        `none, `none, `none
+      | _ -> 
+        system, mode, 
+        `none, `none, `none, `none, 
+        `none, `none, `none
+
+    let cordic ~ld ~system ~mode ~iter ~c ~x ~y ~z = 
+      match arch with
+      | "comb" -> 
+        Uc.cordic ?pipe:None ~system ~mode ~iters ~c ~x ~y ~z 
+      | "pipe" -> 
+        Uc.cordic ~pipe:Signal.Seq.(reg r_sync S.enable) ~system ~mode ~iters ~c ~x ~y ~z 
+      | "iter" -> 
+        Ic.cordic ~ld ~system ~mode ~iter ~c ~x ~y ~z
+      | _ -> failwith "bad arch"
+
+    let hw i = 
+      let open I in
+      let system = match system with None -> i.system | Some(x) -> x in
+      let mode = match mode with None -> i.mode | Some(x) -> x in
+
+      (* inputs may be fixed or scaled by the cordic gain *)
+      let igain = S.consti bits (fixed (1. /. gain)) in
+      let iparm x ix = 
+        match x with
+        | `none -> ix
+        | `fix(x) -> sconst x
+        | `igain -> S.(ix *+ igain)
+      in
+      let x = iparm x' i.x in
+      let y = iparm y' i.y in
+      let z = iparm z' i.z in
+      let c = iparm c' i.c in
+
+      let xo, yo, zo = cordic ~ld:i.ld ~system ~mode ~iter:i.iter ~c ~x ~y ~z in
+
+      (* outputs may be scaled by the cordic gain *)
+      let oparm o' o = 
+        match xo' with
+        | `none -> o
+        | `igain -> S.(o *+ igain)
+      in
+      let xo = oparm xo' xo in
+      let yo = oparm yo' yo in
+      let zo = oparm zo' zo in
+      O.{ xo; yo; zo }
+
+    open I 
+    open O 
+    module Sim = Cyclesim.Api 
+
+    let tb_comb sim i o = 
+      Sim.reset sim;
+      i.x := B.consti bits (fixed x);
+      i.y := B.consti bits (fixed y);
+      i.z := B.consti bits (fixed z);
+      i.c := B.consti bits (fixed c);
+      Sim.cycle sim
+
+    let tb_pipe sim i o =
+      Sim.reset sim;
+      i.enable := B.vdd;
+      i.x := B.consti bits (fixed x);
+      i.y := B.consti bits (fixed y);
+      i.z := B.consti bits (fixed z);
+      i.c := B.consti bits (fixed c);
+      for j=0 to iters-1 do
+        Sim.cycle sim;
+      done;
+      i.enable := B.gnd;
+      Sim.cycle sim
+
+    let tb_iter sim i o =
+      Sim.reset sim;
+      i.enable := B.vdd;
+      i.ld := B.vdd;
+      i.x := B.consti bits (fixed x);
+      i.y := B.consti bits (fixed y);
+      i.z := B.consti bits (fixed z);
+      i.c := B.consti bits (fixed c);
+      Sim.cycle sim;
+      i.ld := B.gnd;
+      for j=0 to iters-1 do
+        i.iter := (B.consti (Utils.nbits iters) j);
+        Sim.cycle sim;
+      done;
+      i.enable := B.gnd;
+      Sim.cycle sim
+
+    let tb = 
+      match arch with
+      | "comb" -> tb_comb
+      | "pipe" -> tb_pipe
+      | "iter" -> tb_iter
+      | _ -> failwith "bad arch"
 
   end
 
