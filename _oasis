@@ -21,13 +21,14 @@ Library HardCamlExamples
   BuildDepends:  hardcaml, hardcaml.syntax
   XMETARequires: hardcaml, hardcaml-waveterm.lterm
 
-#Document HardCamlExamples
-#  Title:                HardCaml Examples documentation
-#  Type:                 ocamlbuild (0.3)
-#  BuildTools+:          ocamldoc
-#  Install:              true
-#  XOCamlbuildPath:      src
-#  XOCamlbuildLibraries: HardCamlExamples
+Document HardCamlExamples
+  Title:                HardCaml Examples documentation
+  Build:                false
+  Type:                 ocamlbuild (0.3)
+  BuildTools+:          ocamldoc
+  Install:              true
+  XOCamlbuildPath:      src
+  XOCamlbuildLibraries: hardcaml-examples
 
 # Command line applications
 

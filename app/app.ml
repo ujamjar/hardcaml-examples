@@ -184,6 +184,10 @@ module Make(D : Design) = struct
         | Some(waves) -> 
           Lwt_main.run (Waveterm_ui.run Waveterm_waves.({ cfg=default; waves }))
       in
+      let () = 
+        if get_bool std_params.gtkwave then 
+          (Printf.printf "press <return> to exit\n"; ignore(read_line()))
+      in
       ()
     end
 

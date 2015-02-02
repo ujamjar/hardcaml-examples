@@ -9,6 +9,9 @@ setup.ml:
 setup.data: setup.ml
 	ocaml setup.ml -configure
 
+doc: setup.ml
+	ocaml setup.ml -doc
+
 install: all
 	ocaml setup.ml -install
 

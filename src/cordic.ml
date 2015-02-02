@@ -8,41 +8,37 @@ type mode =
   | Vectoring 
   | Inverse of float
 
+(* (1/2) * log2 ((1+t) / (1-t)) *)
+let atanh t = 
+  0.5 *. (log ((1.0 +. t) /. (1.0 -. t))) 
+
+let cordic_iter ~iters ~f a = 
+  let rec g i ih k a = 
+    if i=iters then a
+    else
+      let a = f i ih a in
+      if ih=k then g (i+1) ih ((k*3)+1) a
+      else g (i+1) (ih+1) k a
+  in
+  g 0 1 4 a
+
+let gain ~iters = cordic_iter ~iters 
+  ~f:(fun i _ a -> a *. sqrt (1. +. (2. ** (2. *. (float_of_int (- i)))))) 1.
+
+let gainh ~iters = cordic_iter ~iters 
+  ~f:(fun _ i a -> a *. sqrt (1. -. (2. ** (2. *. (float_of_int (- i)))))) 1.
+
 module Double = struct
 
-  (* (1/2) * log2 ((1+t) / (1-t)) *)
-  let atanh t = 
-    0.5 *. (log ((1.0 +. t) /. (1.0 -. t))) 
-
-  (* cordic gain *)
-  let gain ~iters = 
-    let rec f i = 
-      if i=iters then 1. 
-      else sqrt (1. +. (2. ** (2. *. (float_of_int (- i))))) *. f (i+1)
-    in
-    f 0
-
-  (* cordic hyperbolic gain *)
-  let gainh ~iters = 
-    let rec f i k = 
-      if i=iters then 1. 
-      else 
-        let x = sqrt (1. -. (2. ** (2. *. (float_of_int (- i))))) in
-        x *. (if i=k then f i ((k*3)+1) else f (i+1) k)
-    in
-    f 1 4
-
-  let cordic ~system ~mode ~iters ~x ~y ~z = 
-    let rec iter i k x y z = 
-      (*Printf.printf "%i %i\n" i k;*)
-      if i = iters then x, y, z
-      else
-        let t = 2. ** float_of_int (-i) in
-        let m, e = 
+  let cordic ~system ~mode ~iters ~x ~y ~z =
+    cordic_iter ~iters
+      ~f:(fun i ih (x,y,z) ->
+        let t i = 2. ** float_of_int (-i) in
+        let t, m, e = 
           match system with 
-          | Circular -> 1., atan t 
-          | Linear -> 0., t
-          | Hyperbolic -> -1., atanh t
+          | Circular -> let t = t i in t, 1., atan t
+          | Linear -> let t = t i in t, 0., t
+          | Hyperbolic -> let t = t ih in t, -1., atanh t
         in
         let d = 
           match mode with 
@@ -53,10 +49,8 @@ module Double = struct
         let x' = x -. (m *. y *. d *. t) in
         let y' = y +. (x *. d *. t) in
         let z' = z -. (d *. e) in
-        if system = Hyperbolic && i = k then iter i ((3*k)+1) x' y' z'
-        else iter (i+1) k x' y' z'
-    in
-    iter (if system=Hyperbolic then 1 else 0) 4 x y z  
+        x', y', z')
+      (x, y, z)
 
   module Fns(I : sig val iters : int end) = struct
 
@@ -64,6 +58,7 @@ module Double = struct
     let gain = gain ~iters 
     let gainh = gainh ~iters
 
+    (* range |pi/2| *)
     let cos_sin angle = 
       let x, y, _ = cordic ~system:Circular ~mode:Rotation ~iters 
         ~x:(1. /. gain) ~y:0. ~z:angle 
@@ -82,6 +77,7 @@ module Double = struct
       in
       x /. gain, y /. gain
 
+    (* no particular range restriction *)
     let atan a = 
       let _, _, z = cordic ~system:Circular ~mode:Vectoring ~iters 
         ~x:1.0 ~y:a ~z:0. 
@@ -100,6 +96,7 @@ module Double = struct
       in
       x /. gain, z
 
+    (* range ~|0.98| *)
     let asin a = 
       let x, y, z = cordic ~system:Circular ~mode:(Inverse (abs_float a)) ~iters 
         ~x:(1. /. gain) ~y:0. ~z:0. 
@@ -124,6 +121,7 @@ module Double = struct
       in
       x, y
 
+    (* range ~|0.8| *)
     let atanh a = 
       let x, y, z = cordic ~system:Hyperbolic ~mode:Vectoring ~iters 
         ~x:1. ~y:a ~z:0.
@@ -149,17 +147,15 @@ module Unrolled(B : Comb.S)(P : Fixpt) = struct
   let atan iters = 
     Array.init iters (fun i -> constf (atan (2. ** float_of_int (-i))))
 
-  (* XXX hyperbolic repetition...FIXME ? *)
   let atanh iters = 
-    Array.init iters (fun i -> constf (Double.atanh (2. ** float_of_int (-i))))
+    Array.of_list (List.rev (cordic_iter ~iters 
+      ~f:(fun _ ih l -> constf (atanh (2. ** float_of_int (-ih))) :: l) []))
 
   let t iters = 
     Array.init iters (fun i -> B.srl (constf 1.) i)
 
-  let step ~x ~y ~z ~d ~m ~i ~e = 
+  let step ~x ~xsft ~y ~ysft ~z ~d ~m ~e = 
     let open B in
-    let xsft = sra x i in
-    let ysft = sra y i in
     let x' = mux2 (msb m) x (mux2 ((lsb m) ^: d) (x +: ysft) (x -: ysft)) in
     let y' = mux2 d (y -: xsft) (y +: xsft) in
     let z' = mux2 d (z +: e) (z -: e) in
@@ -183,35 +179,43 @@ module Unrolled(B : Comb.S)(P : Fixpt) = struct
     
     let m = system in
     let e = [ atan iters; atanh iters; t iters ] in
+    let is_hyper = system ==: hyperbolic in
 
-    let rec f i x y z = 
-      if i = iters then x, y, z
-      else
+    cordic_iter ~iters 
+      ~f:(fun i ih (x,y,z) ->
         let e = mux system (List.map (fun e -> e.(i)) e) in
         let d = mux mode [ z <+. 0; y >=+. 0; y >=+ c ] in
-        let x, y, z = step ~x ~y ~z ~d ~m ~i ~e:e in
-        f (i+1) (p x) (p y) (p z)
-    in
-    f 0 x y z
+        let xsft = mux2 is_hyper (sra x ih) (sra x i) in
+        let ysft = mux2 is_hyper (sra y ih) (sra y i) in
+        let x, y, z = step ~x ~xsft ~y ~ysft ~z ~d ~m ~e:e in
+        (p x), (p y), (p z)) (x, y, z)
 
 end
 
 module Iterative(P : Fixpt) = struct
 
-  module C = Unrolled(Signal.Comb)(P)
-  open Signal.Comb
+  module S = Signal.Comb
+  (*module S = Const_prop.Comb*)
+  module C = Unrolled(S)(P)
+  open S
   open Signal.Seq
 
-  let step ~x ~y ~z ~d ~m ~i ~e = 
-    let xsft = log_shift sra x i in
-    let ysft = log_shift sra y i in
-    let x' = mux2 (msb m) x (mux2 ((lsb m) ^: d) (x +: ysft) (x -: ysft)) in
-    let y' = mux2 d (y -: xsft) (y +: xsft) in
-    let z' = mux2 d (z +: e) (z -: e) in
-    x', y', z'
+  let hyper_iter ~ld ~system ~iter =
+    let is_hyper = system ==: C.hyperbolic in
+    let iterh = wire (width iter) -- "iterh" in
+    let k = wire (width iter + 2) -- "k" in
+    let repeat = (k ==: ((zero 2) @: iterh)) -- "repeated_step" in
+    let upd v init t f = 
+      v <== reg r_sync enable (mux2 ld (consti (width t) init) (mux2 repeat t f)) 
+    in
+    let () = upd k 4 (k +: (sll k 1) +:. 1) k in 
+    let () = upd iterh 1 iterh (iterh +:. 1) in
+    (mux2 is_hyper iterh iter) -- "iter_sel"
 
-  let cordic ~ld ~system ~mode ~iter ~c ~x ~y ~z = 
-    let iters = 1 lsl (width iter) in
+  let cordic ~ld ~system ~mode ~iters ~c ~x ~y ~z = 
+    let wi = Utils.nbits (iters-1) in
+
+    let iter = reg_fb r_sync enable wi (fun d -> mux2 ld (zero wi) (d +:. 1)) -- "iter" in
 
     let atan = mux iter (Array.to_list (C.atan iters)) in
     let atanh = mux iter (Array.to_list (C.atanh iters)) in
@@ -220,10 +224,14 @@ module Iterative(P : Fixpt) = struct
     let xw, yw, zw = wire P.w, wire P.w, wire P.w in
 
     let m = system in
-    let e = mux system [ atan; atanh; t ] in
+    let e = mux system [ atan; atanh; t ] -- "e" in
     let d = mux mode [ zw <+. 0; yw >=+. 0; yw >=+ c ] in
 
-    let xs, ys, zs = step ~x:xw ~y:yw ~z:zw ~d ~m ~i:iter ~e in
+    let iter = hyper_iter ~ld ~system ~iter in
+
+    let xsft = log_shift sra xw iter in
+    let ysft = log_shift sra yw iter in
+    let xs, ys, zs = C.step ~x:xw ~xsft ~y:yw ~ysft ~z:zw ~d ~m ~e in
 
     xw <== (reg r_sync enable (mux2 ld x xs));
     yw <== (reg r_sync enable (mux2 ld y ys));
@@ -242,7 +250,7 @@ module Design = struct
   let name = "CORDIC"
   let desc = "CORDIC"
 
-  (* for now we dont support the 'asin' functionas it complicates the 
+  (* for now we dont support the 'asin' function as it complicates the 
      generator code.  The generic cores do support it though *)
 
   module Hw_config = struct
@@ -298,7 +306,7 @@ module Design = struct
     let z = get_float T.params.z
     let c = get_float T.params.c
 
-    module I = interface enable[1] ld[1] system[2] mode[2] iter[Utils.nbits iters] c[bits] x[bits] y[bits] z[bits] end
+    module I = interface enable[1] ld[1] system[2] mode[2] c[bits] x[bits] y[bits] z[bits] end
     module O = interface xo[bits] yo[bits] zo[bits] end
 
     let wave_cfg = 
@@ -311,12 +319,12 @@ module Design = struct
           ld = B;
           system = B;
           mode = B;
-          iter = U;
           c = F fp;
           x = F fp;
           y = F fp;
           z = F fp;
         })) @
+      ["iter",U; "iterh",U; "iter_sel",U; "k",U; "e",F fp] @
       O.(to_list (map (fun (n,_) -> n,F fp) t)))
 
     module Fp = struct
@@ -343,8 +351,8 @@ module Design = struct
     let sconst x = S.constibl (List.map B.to_int (B.bits x)) 
     let fixed x = Uc.rnd (x *. (2. ** float_of_int fp))
 
-    let gain = Double.gain ~iters 
-    let gainh = Double.gainh ~iters 
+    let gain = gain ~iters 
+    let gainh = gainh ~iters (* XXX no - I think we need the opposite of this *)
 
     (* configure special functions *)
     let system, mode, x', y', z', c', xo', yo', zo' = 
@@ -395,14 +403,14 @@ module Design = struct
         `none, `none, `none, `none, 
         `none, `none, `none
 
-    let cordic ~ld ~system ~mode ~iter ~c ~x ~y ~z = 
+    let cordic ~ld ~system ~mode ~c ~x ~y ~z = 
       match arch with
       | "comb" -> 
         Uc.cordic ?pipe:None ~system ~mode ~iters ~c ~x ~y ~z 
       | "pipe" -> 
         Uc.cordic ~pipe:Signal.Seq.(reg r_sync S.enable) ~system ~mode ~iters ~c ~x ~y ~z 
       | "iter" -> 
-        Ic.cordic ~ld ~system ~mode ~iter ~c ~x ~y ~z
+        Ic.cordic ~ld ~system ~mode ~iters ~c ~x ~y ~z
       | _ -> failwith "bad arch"
 
     let hw i = 
@@ -423,7 +431,7 @@ module Design = struct
       let z = iparm z' i.z in
       let c = iparm c' i.c in
 
-      let xo, yo, zo = cordic ~ld:i.ld ~system ~mode ~iter:i.iter ~c ~x ~y ~z in
+      let xo, yo, zo = cordic ~ld:i.ld ~system ~mode ~c ~x ~y ~z in
 
       (* outputs may be scaled by the cordic gain *)
       let oparm o' o = 
@@ -472,7 +480,6 @@ module Design = struct
       Sim.cycle sim;
       i.ld := B.gnd;
       for j=0 to iters-1 do
-        i.iter := (B.consti (Utils.nbits iters) j);
         Sim.cycle sim;
       done;
       i.enable := B.gnd;
