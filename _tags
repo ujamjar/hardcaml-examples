@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: beb544baefae3bef2e4d9b4e7e8114a5)
+# DO NOT EDIT (digest: 5a2aaa7bd3c6ebee05de88637d57d89a)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -80,26 +80,4 @@ true: annot, bin_annot
 <app/*.ml{,i,y}>: pkg_str
 <app/*.ml{,i,y}>: use_HardCamlExamples
 <app/hccordic.{native,byte}>: custom
-# Executable hcjssort
-"js/hcjssort.byte": pkg_hardcaml
-"js/hcjssort.byte": pkg_hardcaml-waveterm
-"js/hcjssort.byte": pkg_hardcaml.syntax
-"js/hcjssort.byte": pkg_js_of_ocaml
-"js/hcjssort.byte": pkg_js_of_ocaml.syntax
-"js/hcjssort.byte": use_HardCamlExamples
-"js/hcjssort.byte": custom
-# Executable hcwwsort
-"js/hcwwsort.byte": pkg_hardcaml
-"js/hcwwsort.byte": pkg_hardcaml-waveterm
-"js/hcwwsort.byte": pkg_hardcaml.syntax
-"js/hcwwsort.byte": pkg_js_of_ocaml
-"js/hcwwsort.byte": pkg_js_of_ocaml.syntax
-"js/hcwwsort.byte": use_HardCamlExamples
-<js/*.ml{,i,y}>: pkg_hardcaml
-<js/*.ml{,i,y}>: pkg_hardcaml-waveterm
-<js/*.ml{,i,y}>: pkg_hardcaml.syntax
-<js/*.ml{,i,y}>: pkg_js_of_ocaml
-<js/*.ml{,i,y}>: pkg_js_of_ocaml.syntax
-<js/*.ml{,i,y}>: use_HardCamlExamples
-"js/hcwwsort.byte": custom
 # OASIS_STOP

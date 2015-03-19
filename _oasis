@@ -80,23 +80,23 @@ Executable hccordic
   Install:            false
   BuildDepends:       omd, hardcaml-examples, hardcaml-waveterm.lterm, str
 
-# javascript applications
+# javascript applications - TODO
 
-Executable hcjssort
-  Path:               js
-  MainIs:             hcjssort.ml
-  Custom:             true
-  CompiledObject:     byte
-  Install:            false
-  BuildDepends:       hardcaml-examples, hardcaml-waveterm, js_of_ocaml, js_of_ocaml.syntax
-
-Executable hcwwsort
-  Path:               js
-  MainIs:             hcwwsort.ml
-  Custom:             true
-  CompiledObject:     byte
-  Install:            false
-  BuildDepends:       hardcaml-examples, hardcaml-waveterm, js_of_ocaml, js_of_ocaml.syntax
+#Executable hcjssort
+#  Path:               js
+#  MainIs:             hcjssort.ml
+#  Custom:             true
+#  CompiledObject:     byte
+#  Install:            false
+#  BuildDepends:       hardcaml-examples, hardcaml-waveterm, js_of_ocaml, js_of_ocaml.syntax
+#
+#Executable hcwwsort
+#  Path:               js
+#  MainIs:             hcwwsort.ml
+#  Custom:             true
+#  CompiledObject:     byte
+#  Install:            false
+#  BuildDepends:       hardcaml-examples, hardcaml-waveterm, js_of_ocaml, js_of_ocaml.syntax
 
 SourceRepository master
   Type:     git
