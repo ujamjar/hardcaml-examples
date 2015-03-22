@@ -143,7 +143,7 @@ module Design = struct
 
   module Tb_config = struct
     include interface cycles end
-    let params = C.{ cycles = Int 32, "Number of cycles to test" }
+    let params = C.({ cycles = Int 32, "Number of cycles to test" })
   end
 
   let validate hw tb = 
@@ -187,7 +187,7 @@ module Design = struct
           else
             (module OddEvenMerge(Swap))))
       in
-      O.{ q = Sort.sort i.I.d }
+      O.({ q = Sort.sort i.I.d })
 
     let tb sim i o = 
       let open I in

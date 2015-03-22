@@ -187,7 +187,7 @@ _brent-kung_ and _kogge-stone_."
       end
 
     module A = Adder(Signal.Comb)
-    let hw i = O.{ c = A.add (network()) i.I.a i.I.b i.I.cin }
+    let hw i = O.({ c = A.add (network()) i.I.a i.I.b i.I.cin })
 
     let tb sim i o = 
       let open I in

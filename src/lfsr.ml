@@ -161,7 +161,7 @@ module Design = struct
         else (^:)
       in
       let taps = if counterpt then counterpart taps.(bits) else taps.(bits) in
-      O.{ q = lfsr op taps i.I.d }
+      O.({ q = lfsr op taps i.I.d })
 
     let tb sim i o = 
       let open I in

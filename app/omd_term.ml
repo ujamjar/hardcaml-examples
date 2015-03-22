@@ -68,7 +68,7 @@ let text_of_md md =
     let loop = loop sty in
     (* heading *)
     let h n md tl = 
-      Buffer.add_string b (String.init n (fun _ -> '#'));
+      Buffer.add_string b (Bytes.init n (fun _ -> '#'));
       Buffer.add_char b ' ';
       stylish [`reverse] md;
       loop tl

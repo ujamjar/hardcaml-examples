@@ -253,7 +253,7 @@ and will lead to incorrect results."
     let wave_cfg = 
       let disp prec = if fixed then Display.F(prec) else Display.S in
       let open Display in
-      let i = I.{ (map (fun _ -> disp inpprec) t) with en=B; ld=B; addsub=B; } in
+      let i = I.({ (map (fun _ -> disp inpprec) t) with en=B; ld=B; addsub=B; }) in
       let i = I.(to_list (map2 (fun (n,_) b -> n,b) t i)) in
       let o = O.(to_list (map (fun (n,_) -> n, disp outprec) t)) in 
       Some(["clock",Display.B; "clear", Display.B] @ i @ o @ [("rom_coef",disp coefprec)])

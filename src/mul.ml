@@ -200,7 +200,7 @@ module Design = struct
     let wave_cfg = Some(I.(to_list (map Display.uint t)) @ 
                         O.(to_list (map Display.uint t)))
   
-    let hw i = O.{ q = mul i.I.da i.I.db }
+    let hw i = O.({ q = mul i.I.da i.I.db })
 
     let tb sim i o = 
       let open I in

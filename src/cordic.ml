@@ -442,7 +442,7 @@ module Design = struct
       let xo = oparm xo' xo in
       let yo = oparm yo' yo in
       let zo = oparm zo' zo in
-      O.{ xo; yo; zo }
+      O.({ xo; yo; zo })
 
     open I 
     open O 
