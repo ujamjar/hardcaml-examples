@@ -7,7 +7,7 @@ setup.ml:
 	oasis setup
 
 setup.data: setup.ml
-	ocaml setup.ml -configure
+	ocaml setup.ml -configure 
 
 doc: setup.ml
 	ocaml setup.ml -doc
