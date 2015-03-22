@@ -21,6 +21,15 @@ Library HardCamlExamples
   BuildDepends:  hardcaml, hardcaml.syntax
   XMETARequires: hardcaml, hardcaml-waveterm.lterm
 
+Library HardCamlExamplesApp
+  Path:          app
+  Findlibname:   app
+  FindlibParent: HardCamlExamples
+  Pack:          true
+  Modules:       App, Omd_term
+  BuildDepends:  hardcaml-examples, hardcaml-waveterm.lterm, omd, str
+  XMETARequires: hardcaml-examples, hardcaml-waveterm.lterm, omd, str
+
 Document HardCamlExamples
   Title:                HardCaml Examples documentation
   Build:                false
@@ -38,7 +47,7 @@ Executable hcsort
   Custom:             true
   CompiledObject:     best
   Install:            false
-  BuildDepends:       omd, hardcaml-examples, hardcaml-waveterm.lterm, str
+  BuildDepends:       hardcaml-examples.app
 
 Executable hcmul
   Path:               app
@@ -46,7 +55,7 @@ Executable hcmul
   Custom:             true
   CompiledObject:     best
   Install:            false
-  BuildDepends:       omd, hardcaml-examples, hardcaml-waveterm.lterm, str
+  BuildDepends:       hardcaml-examples.app
 
 Executable hclfsr
   Path:               app
@@ -54,7 +63,7 @@ Executable hclfsr
   Custom:             true
   CompiledObject:     best
   Install:            false
-  BuildDepends:       omd, hardcaml-examples, hardcaml-waveterm.lterm, str
+  BuildDepends:       hardcaml-examples.app
 
 Executable hcprefix
   Path:               app
@@ -62,7 +71,7 @@ Executable hcprefix
   Custom:             true
   CompiledObject:     best
   Install:            false
-  BuildDepends:       omd, hardcaml-examples, hardcaml-waveterm.lterm, str
+  BuildDepends:       hardcaml-examples.app
 
 Executable hcrac
   Path:               app
@@ -70,7 +79,7 @@ Executable hcrac
   Custom:             true
   CompiledObject:     best
   Install:            false
-  BuildDepends:       omd, hardcaml-examples, hardcaml-waveterm.lterm, str
+  BuildDepends:       hardcaml-examples.app
 
 Executable hccordic
   Path:               app
@@ -78,7 +87,7 @@ Executable hccordic
   Custom:             true
   CompiledObject:     best
   Install:            false
-  BuildDepends:       omd, hardcaml-examples, hardcaml-waveterm.lterm, str
+  BuildDepends:       hardcaml-examples.app
 
 # javascript applications - TODO
 

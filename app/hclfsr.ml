@@ -1,2 +1,2 @@
-module A = App.Make(Lfsr.Design)
+module A = App.Make(HardCamlExamples.Lfsr.Design)
 

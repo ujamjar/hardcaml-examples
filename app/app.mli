@@ -1,3 +1,5 @@
+open HardCamlExamples
+
 (** Arg.parse parameter parser *)
 module Command_line(P : Framework.Params) : sig
   val get : unit -> Framework.Param.p P.t
