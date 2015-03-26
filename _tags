@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 15613b1135b72ba1f129abf6f14092b3)
+# DO NOT EDIT (digest: fe78a62d6c7a891778b140c847622884)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -32,6 +32,7 @@ true: annot, bin_annot
 "app/omd_term.cmx": for-pack(HardCamlExamplesApp)
 # Executable hcsort
 <app/hcsort.{native,byte}>: pkg_hardcaml
+<app/hcsort.{native,byte}>: pkg_hardcaml-llvmsim
 <app/hcsort.{native,byte}>: pkg_hardcaml-waveterm.lterm
 <app/hcsort.{native,byte}>: pkg_hardcaml.syntax
 <app/hcsort.{native,byte}>: pkg_omd
@@ -41,6 +42,7 @@ true: annot, bin_annot
 <app/hcsort.{native,byte}>: custom
 # Executable hcmul
 <app/hcmul.{native,byte}>: pkg_hardcaml
+<app/hcmul.{native,byte}>: pkg_hardcaml-llvmsim
 <app/hcmul.{native,byte}>: pkg_hardcaml-waveterm.lterm
 <app/hcmul.{native,byte}>: pkg_hardcaml.syntax
 <app/hcmul.{native,byte}>: pkg_omd
@@ -50,6 +52,7 @@ true: annot, bin_annot
 <app/hcmul.{native,byte}>: custom
 # Executable hclfsr
 <app/hclfsr.{native,byte}>: pkg_hardcaml
+<app/hclfsr.{native,byte}>: pkg_hardcaml-llvmsim
 <app/hclfsr.{native,byte}>: pkg_hardcaml-waveterm.lterm
 <app/hclfsr.{native,byte}>: pkg_hardcaml.syntax
 <app/hclfsr.{native,byte}>: pkg_omd
@@ -59,6 +62,7 @@ true: annot, bin_annot
 <app/hclfsr.{native,byte}>: custom
 # Executable hcprefix
 <app/hcprefix.{native,byte}>: pkg_hardcaml
+<app/hcprefix.{native,byte}>: pkg_hardcaml-llvmsim
 <app/hcprefix.{native,byte}>: pkg_hardcaml-waveterm.lterm
 <app/hcprefix.{native,byte}>: pkg_hardcaml.syntax
 <app/hcprefix.{native,byte}>: pkg_omd
@@ -68,6 +72,7 @@ true: annot, bin_annot
 <app/hcprefix.{native,byte}>: custom
 # Executable hcrac
 <app/hcrac.{native,byte}>: pkg_hardcaml
+<app/hcrac.{native,byte}>: pkg_hardcaml-llvmsim
 <app/hcrac.{native,byte}>: pkg_hardcaml-waveterm.lterm
 <app/hcrac.{native,byte}>: pkg_hardcaml.syntax
 <app/hcrac.{native,byte}>: pkg_omd
@@ -77,6 +82,7 @@ true: annot, bin_annot
 <app/hcrac.{native,byte}>: custom
 # Executable hccordic
 <app/hccordic.{native,byte}>: pkg_hardcaml
+<app/hccordic.{native,byte}>: pkg_hardcaml-llvmsim
 <app/hccordic.{native,byte}>: pkg_hardcaml-waveterm.lterm
 <app/hccordic.{native,byte}>: pkg_hardcaml.syntax
 <app/hccordic.{native,byte}>: pkg_omd
@@ -84,6 +90,7 @@ true: annot, bin_annot
 <app/hccordic.{native,byte}>: use_HardCamlExamples
 <app/hccordic.{native,byte}>: use_HardCamlExamplesApp
 <app/*.ml{,i,y}>: pkg_hardcaml
+<app/*.ml{,i,y}>: pkg_hardcaml-llvmsim
 <app/*.ml{,i,y}>: pkg_hardcaml-waveterm.lterm
 <app/*.ml{,i,y}>: pkg_hardcaml.syntax
 <app/*.ml{,i,y}>: pkg_omd

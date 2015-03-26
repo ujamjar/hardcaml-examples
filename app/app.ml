@@ -38,9 +38,26 @@ module Command_line(P : Params) = struct
 
 end
 
+module Circuit_gen(B : Comb.S)(I : Interface.S)(O : Interface.S) = struct
+
+    module S = Cyclesim.Make(B)
+    module Cs = Cyclesim.Api
+
+    let make name logic sim_provider = 
+        let outputs = logic I.(map (fun (n,b) -> Signal.Comb.input n b) t) in 
+        let circuit = Circuit.make name 
+            (O.to_list (O.map2 (fun (n,_) s -> Signal.Comb.output n s) O.t outputs))
+        in
+        let sim = sim_provider circuit in
+        let inputs = I.(map (fun (n,_) -> try Cs.in_port sim n with _ -> ref B.empty) t) in
+        let outputs = O.(map (fun (n,_) -> try Cs.out_port sim n with _ -> ref B.empty) t) in
+        circuit, sim, inputs, outputs
+
+end
+
 module Make(D : Design) = struct
 
-  module B = Bits.Comb.IntbitsList
+  module B = Bits_ext.Comb.IntbitsList
   module Vcd = Vcd.Make(B)
   module Gtkwave = Vcd_ext.Make(B)
   module ISim = Cyclesim_ext.Interactive(B)
@@ -53,7 +70,7 @@ module Make(D : Design) = struct
     open Param
     include interface 
       vlog vhdl csim tb interactive
-      vcd waveterm gtkwave
+      vcd waveterm gtkwave llvm
     end
     let params = {
       vlog = File "", "generate verilog netlist";
@@ -64,6 +81,7 @@ module Make(D : Design) = struct
       waveterm = Flag false, "integrated waveform viewer";
       gtkwave = Flag false, "gtkwave waveform viewer";
       interactive = Flag false, "interactive text driven testbench mode";
+      llvm = Flag false, "use LLVM simulation backend";
     }
     let validate _ = Ok
   end
@@ -105,13 +123,18 @@ module Make(D : Design) = struct
       let params = tb_params
     end)
 
-  (* generate circuit *)
-  module G = Interface.Gen(B)(H.I)(H.O)
-  let circ, sim, i, o = G.make D.name H.hw
-
-  (* write netlists *)
   open Param
   open Std_config
+
+  (* generate circuit *)
+  module G = Circuit_gen(B)(H.I)(H.O)
+  module Cs = Cyclesim.Make(B)
+  module Cs_llvm = HardCamlLlvmsim.Sim.Make(B)
+  let circ, sim, i, o = G.make D.name H.hw
+    (if get_bool std_params.llvm then Cs_llvm.make
+     else (fun c -> Cs.make ~internal:(Some(fun s -> Signal.Types.names s <> [])) c))
+
+  (* write netlists *)
 
   let with_out_file name f = 
     let file = open_out name in
