@@ -7,7 +7,7 @@ Description: A few simple HardCaml design examples along
   netlists and simulations.
 
 Authors:     Andy Ray
-Maintainers: Andy Ray <andy.ray@unjamjar.org>
+Maintainers: Andy Ray <andy.ray@ujamjar.com>
 Homepage:    https://github.com/ujamjar/hardcaml-examples
 License:     ISC
 Plugins:     META (0.4)
