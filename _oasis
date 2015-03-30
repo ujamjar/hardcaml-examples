@@ -1,6 +1,6 @@
 OASISFormat: 0.4
 Name:        hardcaml-examples
-Version:     0.1
+Version:     0.2
 Synopsis:    HardCaml Examples
 Description: A few simple HardCaml design examples along
   with a generic framework for running them to produce
