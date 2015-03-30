@@ -27,8 +27,8 @@ Library HardCamlExamplesApp
   FindlibParent: HardCamlExamples
   Pack:          true
   Modules:       App, Omd_term
-  BuildDepends:  hardcaml-llvmsim, hardcaml-examples, hardcaml-waveterm.lterm, omd, str
-  XMETARequires: hardcaml-llvmsim, hardcaml-examples, hardcaml-waveterm.lterm, omd, str
+  BuildDepends:  hardcaml.dynlink, hardcaml-examples, hardcaml-waveterm.lterm, omd, str
+  XMETARequires: hardcaml.dynlink, hardcaml-examples, hardcaml-waveterm.lterm, omd, str
 
 Document HardCamlExamples
   Title:                HardCaml Examples documentation
