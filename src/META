@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 6d7f70bb6a01f5fac719c973153eda01)
+# DO NOT EDIT (digest: f79db6491aa5ae2b12c4b16d5b3fa6b1)
 version = "0.1"
 description = "HardCaml Examples"
 requires = "hardcaml hardcaml-waveterm.lterm"
@@ -11,7 +11,8 @@ exists_if = "HardCamlExamples.cma"
 package "app" (
  version = "0.1"
  description = "HardCaml Examples"
- requires = "hardcaml-examples hardcaml-waveterm.lterm omd str"
+ requires =
+ "hardcaml.dynlink hardcaml-examples hardcaml-waveterm.lterm omd str"
  archive(byte) = "HardCamlExamplesApp.cma"
  archive(byte, plugin) = "HardCamlExamplesApp.cma"
  archive(native) = "HardCamlExamplesApp.cmxa"

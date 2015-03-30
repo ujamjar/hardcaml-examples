@@ -3,7 +3,7 @@
 all: setup.data
 	ocaml setup.ml -build
 
-setup.ml:
+setup.ml: _oasis
 	oasis setup
 
 setup.data: setup.ml

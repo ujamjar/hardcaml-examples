@@ -38,9 +38,29 @@ module Command_line(P : Params) = struct
 
 end
 
+module Circuit_gen(B : Comb.S)(I : Interface.S)(O : Interface.S) = struct
+
+    module S = Cyclesim.Make(B)
+    module Cs = Cyclesim.Api
+
+    let make name logic sim_provider = 
+        let outputs = logic I.(map (fun (n,b) -> Signal.Comb.input n b) t) in 
+        let circuit = Circuit.make name 
+            (O.to_list (O.map2 (fun (n,_) s -> Signal.Comb.output n s) O.t outputs))
+        in
+        let sim = sim_provider circuit in
+        let inputs = I.(map (fun (n,_) -> try Cs.in_port sim n with _ -> ref B.empty) t) in
+        let outputs = O.(map (fun (n,_) -> try Cs.out_port sim n with _ -> ref B.empty) t) in
+        circuit, sim, inputs, outputs
+
+end
+
 module Make(D : Design) = struct
 
-  module B = Bits.Comb.IntbitsList
+  (*module B = Bits_ext.Comb.BigarraybitsNativeint*)
+  module B = Bits_ext.Comb.ArraybitsNativeint
+  (*module B = Bits_ext.Comb.IntbitsList*)
+
   module Vcd = Vcd.Make(B)
   module Gtkwave = Vcd_ext.Make(B)
   module ISim = Cyclesim_ext.Interactive(B)
@@ -52,18 +72,22 @@ module Make(D : Design) = struct
   module Std_config = struct
     open Param
     include interface 
-      vlog vhdl csim tb interactive
-      vcd waveterm gtkwave
+      vlog vhdl csim 
+      tb llvm vpi checktb
+      interactive vcd waveterm gtkwave 
     end
     let params = {
       vlog = File "", "generate verilog netlist";
       vhdl = File "", "generate vhdl netlist";
       csim = File "", "generate C simulation model";
       tb = Flag false, "run testbench";
+      llvm = Flag false, "use LLVM backend to run testbench";
+      vpi = Flag false, "use Icarus Verilog to run testbench";
       vcd = File "", "generate VCD file";
       waveterm = Flag false, "integrated waveform viewer";
       gtkwave = Flag false, "gtkwave waveform viewer";
       interactive = Flag false, "interactive text driven testbench mode";
+      checktb = Flag false, "compare ocaml simulation with LLVM/VPI backend";
     }
     let validate _ = Ok
   end
@@ -105,13 +129,50 @@ module Make(D : Design) = struct
       let params = tb_params
     end)
 
-  (* generate circuit *)
-  module G = Interface.Gen(B)(H.I)(H.O)
-  let circ, sim, i, o = G.make D.name H.hw
-
-  (* write netlists *)
   open Param
   open Std_config
+
+  (* generate circuit *)
+  module G = Circuit_gen(B)(H.I)(H.O)
+  module Cs = Cyclesim.Make(B)
+  (*module Cs_llvm = HardCamlLlvmsim.Sim.Make(B)*)
+  module Cs_vpi = Cosim.Make(B)
+  (* choose simulation backend.
+     ocaml, llvm or vpi backend, with optional combining *)
+  let circ, sim, i, o =
+    (* options *)
+    let tb = get_bool std_params.tb in
+    let llvm = get_bool std_params.llvm in
+    let vpi = get_bool std_params.vpi in
+    let checktb = get_bool std_params.checktb in
+    (* simulators *)
+    let cs = Cs.make ?log:None ?inst:None ~internal:(Some(fun s -> Signal.Types.names s <> [])) in
+    let cs_llvm c = 
+      let () = Dynlink.allow_unsafe_modules true in
+      let () = 
+        try HardCamlDynlink.Sim_provider.load_provider_from_package "hardcaml-llvmsim" "HardCamlLlvmsim.cma"
+        with Dynlink.Error e -> failwith (Dynlink.error_message e)
+      in
+      let sim = HardCamlDynlink.Sim_provider.get_provider "hardcaml-llvmsim" in
+      let module F = (val sim : HardCamlDynlink.Sim_provider.S) in
+      let module Cs_llvm = F(B) in
+      Cs_llvm.make c in
+    let cs_vpi = Cs_vpi.make ?dump_file:None in
+    let combine = Cs.combine_strict in
+    let open Printf in
+    let sim = 
+      match tb, checktb, llvm, vpi with 
+      | true, false, true, false -> cs_llvm
+      | true, false, false, true -> cs_vpi
+      | true, false, true, true -> failwith "cannot specify llvm and vpi without checktb"
+      | true, true, true, false -> (fun s -> combine (cs s) (cs_llvm s))
+      | true, true, false, true -> (fun s -> combine (cs s) (cs_vpi s))
+      | true, true, true, true -> (fun s -> combine (cs s) (combine (cs_vpi s) (cs_llvm s)))
+      | _ -> cs
+    in
+    G.make D.name H.hw sim
+
+  (* write netlists *)
 
   let with_out_file name f = 
     let file = open_out name in
