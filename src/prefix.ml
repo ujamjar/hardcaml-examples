@@ -189,7 +189,7 @@ _brent-kung_ and _kogge-stone_."
     module A = Adder(Signal.Comb)
     let hw i = O.({ c = A.add (network()) i.I.a i.I.b i.I.cin })
 
-    let tb sim i o = 
+    let tb sim i o _ = 
       let open I in
       let open O in
       let module S = Cyclesim.Api in

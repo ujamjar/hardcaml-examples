@@ -70,7 +70,8 @@ module type Design = sig
     module O : HardCaml.Interface.S
     val wave_cfg : (string * Display.t) list option
     val hw : HardCaml.Signal.Comb.t I.t -> HardCaml.Signal.Comb.t O.t
-    val tb : B.t HardCaml.Cyclesim.Api.cyclesim -> B.t ref I.t -> B.t ref O.t -> unit
+    val tb : B.t HardCaml.Cyclesim.Api.cyclesim -> 
+      B.t ref I.t -> B.t ref O.t -> B.t ref O.t -> unit
   end
 end
 
@@ -88,6 +89,6 @@ module Design_none = struct
     module O = HardCaml.Interface.Empty
     let wave_cfg = None
     let hw _ = O.None
-    let tb _ _ _ = ()
+    let tb _ _ _ _ = ()
   end
 end

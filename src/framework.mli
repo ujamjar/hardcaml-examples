@@ -124,7 +124,8 @@ module type Design = sig
     val hw : HardCaml.Signal.Comb.t I.t -> HardCaml.Signal.Comb.t O.t
 
     (** Run a testbench *)
-    val tb : B.t HardCaml.Cyclesim.Api.cyclesim -> B.t ref I.t -> B.t ref O.t -> unit
+    val tb : B.t HardCaml.Cyclesim.Api.cyclesim -> 
+      B.t ref I.t -> B.t ref O.t -> B.t ref O.t -> unit
   end
 end
 

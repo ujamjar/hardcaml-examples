@@ -202,7 +202,7 @@ module Design = struct
   
     let hw i = O.({ q = mul i.I.da i.I.db })
 
-    let tb sim i o = 
+    let tb sim i o _ = 
       let open I in
       let open O in
       let module S = Cyclesim.Api in

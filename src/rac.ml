@@ -266,7 +266,7 @@ and will lead to incorrect results."
             ~romcoefs:romcoefs ~x:(Array.to_list i.x))
       }
 
-    let tb sim i o = 
+    let tb sim i o _ = 
       let open I in
       let open O in
       let module S = Cyclesim.Api in

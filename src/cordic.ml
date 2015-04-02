@@ -448,7 +448,7 @@ module Design = struct
     open O 
     module Sim = Cyclesim.Api 
 
-    let tb_comb sim i o = 
+    let tb_comb sim i o _ = 
       Sim.reset sim;
       i.x := B.consti bits (fixed x);
       i.y := B.consti bits (fixed y);
@@ -456,7 +456,7 @@ module Design = struct
       i.c := B.consti bits (fixed c);
       Sim.cycle sim
 
-    let tb_pipe sim i o =
+    let tb_pipe sim i o _ =
       Sim.reset sim;
       i.enable := B.vdd;
       i.x := B.consti bits (fixed x);
@@ -469,7 +469,7 @@ module Design = struct
       i.enable := B.gnd;
       Sim.cycle sim
 
-    let tb_iter sim i o =
+    let tb_iter sim i o _ =
       Sim.reset sim;
       i.enable := B.vdd;
       i.ld := B.vdd;

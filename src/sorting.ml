@@ -189,7 +189,7 @@ module Design = struct
       in
       O.({ q = Sort.sort i.I.d })
 
-    let tb sim i o = 
+    let tb sim i o _ = 
       let open I in
       let open O in
       let module S = Cyclesim.Api in

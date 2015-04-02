@@ -51,7 +51,8 @@ module Circuit_gen(B : Comb.S)(I : Interface.S)(O : Interface.S) = struct
         let sim = sim_provider circuit in
         let inputs = I.(map (fun (n,_) -> try Cs.in_port sim n with _ -> ref B.empty) t) in
         let outputs = O.(map (fun (n,_) -> try Cs.out_port sim n with _ -> ref B.empty) t) in
-        circuit, sim, inputs, outputs
+        let next = O.(map (fun (n,_) -> try Cs.out_port_next sim n with _ -> ref B.empty) t) in
+        circuit, sim, inputs, outputs, next
 
 end
 
@@ -139,7 +140,7 @@ module Make(D : Design) = struct
   module Cs_vpi = Cosim.Make(B)
   (* choose simulation backend.
      ocaml, llvm or vpi backend, with optional combining *)
-  let circ, sim, i, o =
+  let circ, sim, i, o, n =
     (* options *)
     let tb = get_bool std_params.tb in
     let llvm = get_bool std_params.llvm in
@@ -236,7 +237,7 @@ module Make(D : Design) = struct
         if get_bool std_params.interactive then (* use hardcaml-waveterm when ready *)
           ISim.run stdin sim
         else
-          H.tb sim i o
+          H.tb sim i o n
       in
       (* display waveterm *)
       let () = 

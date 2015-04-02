@@ -163,7 +163,7 @@ module Design = struct
       let taps = if counterpt then counterpart taps.(bits) else taps.(bits) in
       O.({ q = lfsr op taps i.I.d })
 
-    let tb sim i o = 
+    let tb sim i o _ = 
       let open I in
       let open O in
       let module S = Cyclesim.Api in
