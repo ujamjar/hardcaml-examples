@@ -1,7 +1,6 @@
 (* javascript hardcaml app framwork *)
 
-open HardCamlExamples.Framework
-
+open HardCamlFramework.Framework
 
 let run_main () = Dom_html.window##onload <- Dom_html.handler (fun e ->
   let worker = Web_worker.Main.worker (Js.string "appww.js") in

@@ -107,6 +107,6 @@ module OddEvenMerge(S : Swap) : (Sort with type t = S.t)
 
 (** {2 Design} *)
 
-module Design : Framework.Design
+module Design : HardCamlFramework.Framework.Design
 
 

@@ -152,7 +152,7 @@ end
 
 module Design = struct
   open HardCaml
-  open Framework
+  open HardCamlFramework.Framework
   open Param
 
   let name = "mult"

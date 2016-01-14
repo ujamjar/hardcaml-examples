@@ -60,7 +60,7 @@ let rac ~fixed ~accbits ~romshift ~en ~ld ~addsub ~romcoefs ~x =
 
 module Design = struct
 
-  open Framework
+  open HardCamlFramework.Framework
   open Param
 
   let name = "RAC"

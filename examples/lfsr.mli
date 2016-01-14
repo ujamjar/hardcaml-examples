@@ -36,4 +36,4 @@ module Make(B : S) : sig
 
 end
 
-module Design : Framework.Design
+module Design : HardCamlFramework.Framework.Design

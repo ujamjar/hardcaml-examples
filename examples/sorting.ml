@@ -1,4 +1,5 @@
 open HardCaml
+open HardCamlFramework
 open Utils
 
 type dirn = Up | Down

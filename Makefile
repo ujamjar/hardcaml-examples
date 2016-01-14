@@ -22,6 +22,9 @@ clean:
 	ocaml setup.ml -clean
 	find . -name "*~" | xargs rm -f
 
+distclean: clean
+	ocaml setup.ml -distclean
+
 js:
 	ocamlbuild -use-ocamlfind \
 		hcjssort.byte hcwwsort.byte 

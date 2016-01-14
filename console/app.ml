@@ -1,6 +1,6 @@
 (* application framework *)
 
-open HardCamlExamples.Framework
+open HardCamlFramework.Framework
 open HardCaml
 
 module Command_line(P : Params) = struct

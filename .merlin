@@ -1,7 +1,8 @@
-S src
-S app
+S framework
+S examples
+S console
 S js
-B _build
+B _build/**
 PKG hardcaml
 PKG lwt
 PKG omd

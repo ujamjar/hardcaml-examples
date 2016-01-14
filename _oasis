@@ -13,99 +13,132 @@ License:     ISC
 Plugins:     META (0.4)
 BuildTools:  ocamlbuild
 
+################################################
+# HardCamlFramework
+#   HardCamlFrameworkConsole
+#   HardCamlFrameworkJS
+#
+#   HardCamlExamples
+#
+#     ConsoleApps
+#     JavascriptApps
+################################################
+
+Library HardCamlFramework
+  Path:          framework
+  Findlibname:   hardcaml-framework
+  Pack:          true
+  Modules:       Framework
+  BuildDepends:  hardcaml, hardcaml.syntax
+  XMETARequires: hardcaml
+
 Library HardCamlExamples
-  Path:          src
+  Path:          examples
   Findlibname:   hardcaml-examples
   Pack:          true
-  Modules:       Framework, Add, Sorting, Rac, Cordic, Prefix, Mul, Lfsr
-  BuildDepends:  hardcaml, hardcaml.syntax
-  XMETARequires: hardcaml, hardcaml-waveterm.lterm
+  Modules:       Add, Sorting, Rac, Cordic, Prefix, Mul, Lfsr
+  BuildDepends:  hardcaml-framework
+  XMETARequires: hardcaml-framework
 
-Library HardCamlExamplesApp
-  Path:          app
-  Findlibname:   app
-  FindlibParent: HardCamlExamples
+Library HardCamlFrameworkConsole
+  Path:          console
+  Findlibname:   console
+  FindlibParent: HardCamlFramework
   Pack:          true
   Modules:       App, Omd_term
-  BuildDepends:  hardcaml.dynlink, hardcaml-examples, hardcaml-waveterm.lterm, omd, str
-  XMETARequires: hardcaml.dynlink, hardcaml-examples, hardcaml-waveterm.lterm, omd, str
+  BuildDepends:  hardcaml.dynlink, hardcaml-framework, hardcaml-waveterm.lterm, omd, str
+  XMETARequires: hardcaml.dynlink, hardcaml-framework, hardcaml-waveterm.lterm, omd, str
 
-Document HardCamlExamples
-  Title:                HardCaml Examples documentation
-  Build:                false
-  Type:                 ocamlbuild (0.3)
-  BuildTools+:          ocamldoc
-  Install:              true
-  XOCamlbuildPath:      src
-  XOCamlbuildLibraries: hardcaml-examples
+Flag js
+  Description: Build javascript frontend
+  Default: true
+
+Library HardCamlFrameworkJS
+  Build$:        flag(js)
+  Path:          js
+  Findlibname:   js
+  FindlibParent: HardCamlFramework
+  Pack:          true
+  Modules:       Web_worker, Appjs, Appww
+  BuildDepends:  hardcaml-examples, omd, str, js_of_ocaml, js_of_ocaml.syntax
+  XMETARequires: hardcaml-examples, omd, str, js_of_ocaml
+
+#Document HardCamlExamples
+#  Title:                HardCaml Examples documentation
+#  Build:                false
+#  Type:                 ocamlbuild (0.3)
+#  BuildTools+:          ocamldoc
+#  Install:              true
+#  XOCamlbuildPath:      src
+#  XOCamlbuildLibraries: hardcaml-examples
 
 # Command line applications
 
 Executable hcsort
-  Path:               app
+  Path:               top
   MainIs:             hcsort.ml
   Custom:             true
   CompiledObject:     best
   Install:            false
-  BuildDepends:       hardcaml-examples.app
+  BuildDepends:       hardcaml-framework.console, hardcaml-examples
 
 Executable hcmul
-  Path:               app
+  Path:               top
   MainIs:             hcmul.ml
   Custom:             true
   CompiledObject:     best
   Install:            false
-  BuildDepends:       hardcaml-examples.app
+  BuildDepends:       hardcaml-framework.console, hardcaml-examples
 
 Executable hclfsr
-  Path:               app
+  Path:               top
   MainIs:             hclfsr.ml
   Custom:             true
   CompiledObject:     best
   Install:            false
-  BuildDepends:       hardcaml-examples.app
+  BuildDepends:       hardcaml-framework.console, hardcaml-examples
 
 Executable hcprefix
-  Path:               app
+  Path:               top
   MainIs:             hcprefix.ml
   Custom:             true
   CompiledObject:     best
   Install:            false
-  BuildDepends:       hardcaml-examples.app
+  BuildDepends:       hardcaml-framework.console, hardcaml-examples
 
 Executable hcrac
-  Path:               app
+  Path:               top
   MainIs:             hcrac.ml
   Custom:             true
   CompiledObject:     best
   Install:            false
-  BuildDepends:       hardcaml-examples.app
+  BuildDepends:       hardcaml-framework.console, hardcaml-examples
 
 Executable hccordic
-  Path:               app
+  Path:               top
   MainIs:             hccordic.ml
   Custom:             true
   CompiledObject:     best
   Install:            false
-  BuildDepends:       hardcaml-examples.app
+  BuildDepends:       hardcaml-framework.console, hardcaml-examples
 
 # javascript applications - TODO
 
-#Executable hcjssort
-#  Path:               js
-#  MainIs:             hcjssort.ml
-#  Custom:             true
-#  CompiledObject:     byte
-#  Install:            false
-#  BuildDepends:       hardcaml-examples, hardcaml-waveterm, js_of_ocaml, js_of_ocaml.syntax
-#
-#Executable hcwwsort
-#  Path:               js
-#  MainIs:             hcwwsort.ml
-#  Custom:             true
-#  CompiledObject:     byte
-#  Install:            false
-#  BuildDepends:       hardcaml-examples, hardcaml-waveterm, js_of_ocaml, js_of_ocaml.syntax
+Executable hcjssort
+  Path:               top
+  MainIs:             hcjssort.ml
+  Custom:             true
+  CompiledObject:     byte
+  Install:            false
+  BuildDepends:       hardcaml-framework.js, hardcaml-examples, js_of_ocaml, js_of_ocaml.syntax
+
+Executable hcwwsort
+  Path:               top
+  MainIs:             hcwwsort.ml
+  Custom:             true
+  CompiledObject:     byte
+  Install:            false
+  BuildDepends:       hardcaml-framework.js, hardcaml-examples, js_of_ocaml, js_of_ocaml.syntax
 
 SourceRepository master
   Type:     git

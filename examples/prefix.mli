@@ -31,5 +31,5 @@ module Adder(B : HardCaml.Comb.S) : sig
 
 end
 
-module Design : Framework.Design
+module Design : HardCamlFramework.Framework.Design
 

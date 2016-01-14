@@ -1,4 +1,4 @@
-open HardCamlExamples
+open HardCamlFramework
 
 (** Arg.parse parameter parser *)
 module Command_line(P : Framework.Params) : sig

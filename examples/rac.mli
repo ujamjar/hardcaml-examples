@@ -61,6 +61,6 @@ val rac :
 
 (** {2 RAC design } *)
 
-module Design : Framework.Design
+module Design : HardCamlFramework.Framework.Design
 
 
