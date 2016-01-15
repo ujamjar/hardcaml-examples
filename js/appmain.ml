@@ -59,10 +59,9 @@ module Js_utils = struct
     let div = D.createDiv D.document in
     div
 
-  let mk_p ?(className="label") s = 
+  let mk_p s = 
     let d = D.document in
     let t = D.createP d in
-    t##className <- Js.string className;
     t##innerHTML <- Js.string s;
     t
 
