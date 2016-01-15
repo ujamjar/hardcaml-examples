@@ -1,2 +1,2 @@
-let _ = Appjs.run_main ()
+module A = HardCamlFrameworkJS.Appmain.Make(HardCamlExamples.Sorting.Design)
 

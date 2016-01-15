@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: c940e9de4d749ac1e189a632f512f004)
+# DO NOT EDIT (digest: 8fdf182e34aa9c880af06a21cddd0255)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -34,7 +34,6 @@ true: annot, bin_annot
 # Library HardCamlFrameworkConsole
 "console/HardCamlFrameworkConsole.cmxs": use_HardCamlFrameworkConsole
 "console/app.cmx": for-pack(HardCamlFrameworkConsole)
-"console/omd_term.cmx": for-pack(HardCamlFrameworkConsole)
 <console/*.ml{,i,y}>: pkg_hardcaml
 <console/*.ml{,i,y}>: pkg_hardcaml-waveterm.lterm
 <console/*.ml{,i,y}>: pkg_hardcaml.dynlink
@@ -45,9 +44,11 @@ true: annot, bin_annot
 # Library HardCamlFrameworkJS
 "js/HardCamlFrameworkJS.cmxs": use_HardCamlFrameworkJS
 "js/web_worker.cmx": for-pack(HardCamlFrameworkJS)
-"js/appjs.cmx": for-pack(HardCamlFrameworkJS)
+"js/message.cmx": for-pack(HardCamlFrameworkJS)
+"js/appmain.cmx": for-pack(HardCamlFrameworkJS)
 "js/appww.cmx": for-pack(HardCamlFrameworkJS)
 <js/*.ml{,i,y}>: pkg_hardcaml
+<js/*.ml{,i,y}>: pkg_hardcaml.js
 <js/*.ml{,i,y}>: pkg_hardcaml.syntax
 <js/*.ml{,i,y}>: pkg_js_of_ocaml
 <js/*.ml{,i,y}>: pkg_js_of_ocaml.syntax
@@ -126,6 +127,7 @@ true: annot, bin_annot
 <top/hccordic.{native,byte}>: custom
 # Executable hcjssort
 "top/hcjssort.byte": pkg_hardcaml
+"top/hcjssort.byte": pkg_hardcaml.js
 "top/hcjssort.byte": pkg_hardcaml.syntax
 "top/hcjssort.byte": pkg_js_of_ocaml
 "top/hcjssort.byte": pkg_js_of_ocaml.syntax
@@ -137,6 +139,7 @@ true: annot, bin_annot
 "top/hcjssort.byte": custom
 # Executable hcwwsort
 "top/hcwwsort.byte": pkg_hardcaml
+"top/hcwwsort.byte": pkg_hardcaml.js
 "top/hcwwsort.byte": pkg_hardcaml.syntax
 "top/hcwwsort.byte": pkg_js_of_ocaml
 "top/hcwwsort.byte": pkg_js_of_ocaml.syntax
@@ -145,7 +148,32 @@ true: annot, bin_annot
 "top/hcwwsort.byte": use_HardCamlExamples
 "top/hcwwsort.byte": use_HardCamlFramework
 "top/hcwwsort.byte": use_HardCamlFrameworkJS
+"top/hcwwsort.byte": custom
+# Executable hcjsrac
+"top/hcjsrac.byte": pkg_hardcaml
+"top/hcjsrac.byte": pkg_hardcaml.js
+"top/hcjsrac.byte": pkg_hardcaml.syntax
+"top/hcjsrac.byte": pkg_js_of_ocaml
+"top/hcjsrac.byte": pkg_js_of_ocaml.syntax
+"top/hcjsrac.byte": pkg_omd
+"top/hcjsrac.byte": pkg_str
+"top/hcjsrac.byte": use_HardCamlExamples
+"top/hcjsrac.byte": use_HardCamlFramework
+"top/hcjsrac.byte": use_HardCamlFrameworkJS
+"top/hcjsrac.byte": custom
+# Executable hcwwrac
+"top/hcwwrac.byte": pkg_hardcaml
+"top/hcwwrac.byte": pkg_hardcaml.js
+"top/hcwwrac.byte": pkg_hardcaml.syntax
+"top/hcwwrac.byte": pkg_js_of_ocaml
+"top/hcwwrac.byte": pkg_js_of_ocaml.syntax
+"top/hcwwrac.byte": pkg_omd
+"top/hcwwrac.byte": pkg_str
+"top/hcwwrac.byte": use_HardCamlExamples
+"top/hcwwrac.byte": use_HardCamlFramework
+"top/hcwwrac.byte": use_HardCamlFrameworkJS
 <top/*.ml{,i,y}>: pkg_hardcaml
+<top/*.ml{,i,y}>: pkg_hardcaml.js
 <top/*.ml{,i,y}>: pkg_hardcaml.syntax
 <top/*.ml{,i,y}>: pkg_js_of_ocaml
 <top/*.ml{,i,y}>: pkg_js_of_ocaml.syntax
@@ -154,5 +182,5 @@ true: annot, bin_annot
 <top/*.ml{,i,y}>: use_HardCamlExamples
 <top/*.ml{,i,y}>: use_HardCamlFramework
 <top/*.ml{,i,y}>: use_HardCamlFrameworkJS
-"top/hcwwsort.byte": custom
+"top/hcwwrac.byte": custom
 # OASIS_STOP

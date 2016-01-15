@@ -45,7 +45,7 @@ Library HardCamlFrameworkConsole
   Findlibname:   console
   FindlibParent: HardCamlFramework
   Pack:          true
-  Modules:       App, Omd_term
+  Modules:       App
   BuildDepends:  hardcaml.dynlink, hardcaml-framework, hardcaml-waveterm.lterm, omd, str
   XMETARequires: hardcaml.dynlink, hardcaml-framework, hardcaml-waveterm.lterm, omd, str
 
@@ -59,9 +59,9 @@ Library HardCamlFrameworkJS
   Findlibname:   js
   FindlibParent: HardCamlFramework
   Pack:          true
-  Modules:       Web_worker, Appjs, Appww
-  BuildDepends:  hardcaml-examples, omd, str, js_of_ocaml, js_of_ocaml.syntax
-  XMETARequires: hardcaml-examples, omd, str, js_of_ocaml
+  Modules:       Web_worker, Message, Appmain, Appww
+  BuildDepends:  hardcaml-examples, hardcaml.js, omd, str, js_of_ocaml, js_of_ocaml.syntax
+  XMETARequires: hardcaml-examples, hardcaml.js, omd, str, js_of_ocaml
 
 #Document HardCamlExamples
 #  Title:                HardCaml Examples documentation
@@ -122,7 +122,7 @@ Executable hccordic
   Install:            false
   BuildDepends:       hardcaml-framework.console, hardcaml-examples
 
-# javascript applications - TODO
+# javascript applications 
 
 Executable hcjssort
   Path:               top
@@ -135,6 +135,22 @@ Executable hcjssort
 Executable hcwwsort
   Path:               top
   MainIs:             hcwwsort.ml
+  Custom:             true
+  CompiledObject:     byte
+  Install:            false
+  BuildDepends:       hardcaml-framework.js, hardcaml-examples, js_of_ocaml, js_of_ocaml.syntax
+
+Executable hcjsrac
+  Path:               top
+  MainIs:             hcjsrac.ml
+  Custom:             true
+  CompiledObject:     byte
+  Install:            false
+  BuildDepends:       hardcaml-framework.js, hardcaml-examples, js_of_ocaml, js_of_ocaml.syntax
+
+Executable hcwwrac
+  Path:               top
+  MainIs:             hcwwrac.ml
   Custom:             true
   CompiledObject:     byte
   Install:            false

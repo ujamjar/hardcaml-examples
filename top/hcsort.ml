@@ -1,2 +1,2 @@
-module A = App.Make(HardCamlExamples.Sorting.Design)
+module A = HardCamlFrameworkConsole.App.Make(HardCamlExamples.Sorting.Design)
 

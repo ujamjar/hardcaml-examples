@@ -18,17 +18,27 @@ install: all
 uninstall: 
 	ocamlfind remove hardcaml-examples
 
-clean:
+clean: cleanjs
 	ocaml setup.ml -clean
 	find . -name "*~" | xargs rm -f
 
 distclean: clean
 	ocaml setup.ml -distclean
 
-js:
-	ocamlbuild -use-ocamlfind \
-		hcjssort.byte hcwwsort.byte 
-	js_of_ocaml +nat.js hcjssort.byte
-	js_of_ocaml +nat.js hcwwsort.byte
+######################################################################
+# compile javascript apps
 
+html/hcjs%.js: hcjs%.byte
+	js_of_ocaml +nat.js -o $@ $<
+
+html/hcww%.js: hcww%.byte
+	js_of_ocaml +nat.js -o $@ $<
+
+WEBAPP = sort rac
+WEBAPPJS = $(foreach core, $(WEBAPP), html/hcjs$(core).js html/hcww$(core).js) 
+
+cleanjs:
+	rm -f $(WEBAPPJS)
+
+js: all $(WEBAPPJS)
 

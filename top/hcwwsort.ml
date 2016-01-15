@@ -1,1 +1,1 @@
-let _ = Appww.run_webworker()
+module A = HardCamlFrameworkJS.Appww.Make(HardCamlExamples.Sorting.Design)

@@ -1,0 +1,12 @@
+# OASIS_START
+# DO NOT EDIT (digest: 82f277a4ae599f4be1beef4ff54ce5f4)
+version = "0.2"
+description = "HardCaml Examples"
+requires = "hardcaml-framework"
+archive(byte) = "HardCamlExamples.cma"
+archive(byte, plugin) = "HardCamlExamples.cma"
+archive(native) = "HardCamlExamples.cmxa"
+archive(native, plugin) = "HardCamlExamples.cmxs"
+exists_if = "HardCamlExamples.cma"
+# OASIS_STOP
+

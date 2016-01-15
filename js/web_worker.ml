@@ -25,6 +25,6 @@ module Thread = struct
             Dom_html.event_listener Js.writeonly_prop
     end
 
-    let worker : worker Js.t = Js.Unsafe.variable "this"
+    let worker : worker Js.t = Js.Unsafe.variable "self"
 end
 
