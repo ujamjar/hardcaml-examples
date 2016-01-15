@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 8fdf182e34aa9c880af06a21cddd0255)
+# DO NOT EDIT (digest: 3b47ce116bd7ac9e4bfd99c1e190b1bd)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -149,6 +149,102 @@ true: annot, bin_annot
 "top/hcwwsort.byte": use_HardCamlFramework
 "top/hcwwsort.byte": use_HardCamlFrameworkJS
 "top/hcwwsort.byte": custom
+# Executable hcjscordic
+"top/hcjscordic.byte": pkg_hardcaml
+"top/hcjscordic.byte": pkg_hardcaml.js
+"top/hcjscordic.byte": pkg_hardcaml.syntax
+"top/hcjscordic.byte": pkg_js_of_ocaml
+"top/hcjscordic.byte": pkg_js_of_ocaml.syntax
+"top/hcjscordic.byte": pkg_omd
+"top/hcjscordic.byte": pkg_str
+"top/hcjscordic.byte": use_HardCamlExamples
+"top/hcjscordic.byte": use_HardCamlFramework
+"top/hcjscordic.byte": use_HardCamlFrameworkJS
+"top/hcjscordic.byte": custom
+# Executable hcwwcordic
+"top/hcwwcordic.byte": pkg_hardcaml
+"top/hcwwcordic.byte": pkg_hardcaml.js
+"top/hcwwcordic.byte": pkg_hardcaml.syntax
+"top/hcwwcordic.byte": pkg_js_of_ocaml
+"top/hcwwcordic.byte": pkg_js_of_ocaml.syntax
+"top/hcwwcordic.byte": pkg_omd
+"top/hcwwcordic.byte": pkg_str
+"top/hcwwcordic.byte": use_HardCamlExamples
+"top/hcwwcordic.byte": use_HardCamlFramework
+"top/hcwwcordic.byte": use_HardCamlFrameworkJS
+"top/hcwwcordic.byte": custom
+# Executable hcjslfsr
+"top/hcjslfsr.byte": pkg_hardcaml
+"top/hcjslfsr.byte": pkg_hardcaml.js
+"top/hcjslfsr.byte": pkg_hardcaml.syntax
+"top/hcjslfsr.byte": pkg_js_of_ocaml
+"top/hcjslfsr.byte": pkg_js_of_ocaml.syntax
+"top/hcjslfsr.byte": pkg_omd
+"top/hcjslfsr.byte": pkg_str
+"top/hcjslfsr.byte": use_HardCamlExamples
+"top/hcjslfsr.byte": use_HardCamlFramework
+"top/hcjslfsr.byte": use_HardCamlFrameworkJS
+"top/hcjslfsr.byte": custom
+# Executable hcwwlfsr
+"top/hcwwlfsr.byte": pkg_hardcaml
+"top/hcwwlfsr.byte": pkg_hardcaml.js
+"top/hcwwlfsr.byte": pkg_hardcaml.syntax
+"top/hcwwlfsr.byte": pkg_js_of_ocaml
+"top/hcwwlfsr.byte": pkg_js_of_ocaml.syntax
+"top/hcwwlfsr.byte": pkg_omd
+"top/hcwwlfsr.byte": pkg_str
+"top/hcwwlfsr.byte": use_HardCamlExamples
+"top/hcwwlfsr.byte": use_HardCamlFramework
+"top/hcwwlfsr.byte": use_HardCamlFrameworkJS
+"top/hcwwlfsr.byte": custom
+# Executable hcjsmul
+"top/hcjsmul.byte": pkg_hardcaml
+"top/hcjsmul.byte": pkg_hardcaml.js
+"top/hcjsmul.byte": pkg_hardcaml.syntax
+"top/hcjsmul.byte": pkg_js_of_ocaml
+"top/hcjsmul.byte": pkg_js_of_ocaml.syntax
+"top/hcjsmul.byte": pkg_omd
+"top/hcjsmul.byte": pkg_str
+"top/hcjsmul.byte": use_HardCamlExamples
+"top/hcjsmul.byte": use_HardCamlFramework
+"top/hcjsmul.byte": use_HardCamlFrameworkJS
+"top/hcjsmul.byte": custom
+# Executable hcwwmul
+"top/hcwwmul.byte": pkg_hardcaml
+"top/hcwwmul.byte": pkg_hardcaml.js
+"top/hcwwmul.byte": pkg_hardcaml.syntax
+"top/hcwwmul.byte": pkg_js_of_ocaml
+"top/hcwwmul.byte": pkg_js_of_ocaml.syntax
+"top/hcwwmul.byte": pkg_omd
+"top/hcwwmul.byte": pkg_str
+"top/hcwwmul.byte": use_HardCamlExamples
+"top/hcwwmul.byte": use_HardCamlFramework
+"top/hcwwmul.byte": use_HardCamlFrameworkJS
+"top/hcwwmul.byte": custom
+# Executable hcjsprefix
+"top/hcjsprefix.byte": pkg_hardcaml
+"top/hcjsprefix.byte": pkg_hardcaml.js
+"top/hcjsprefix.byte": pkg_hardcaml.syntax
+"top/hcjsprefix.byte": pkg_js_of_ocaml
+"top/hcjsprefix.byte": pkg_js_of_ocaml.syntax
+"top/hcjsprefix.byte": pkg_omd
+"top/hcjsprefix.byte": pkg_str
+"top/hcjsprefix.byte": use_HardCamlExamples
+"top/hcjsprefix.byte": use_HardCamlFramework
+"top/hcjsprefix.byte": use_HardCamlFrameworkJS
+"top/hcjsprefix.byte": custom
+# Executable hcwwprefix
+"top/hcwwprefix.byte": pkg_hardcaml
+"top/hcwwprefix.byte": pkg_hardcaml.js
+"top/hcwwprefix.byte": pkg_hardcaml.syntax
+"top/hcwwprefix.byte": pkg_js_of_ocaml
+"top/hcwwprefix.byte": pkg_js_of_ocaml.syntax
+"top/hcwwprefix.byte": pkg_omd
+"top/hcwwprefix.byte": pkg_str
+"top/hcwwprefix.byte": use_HardCamlExamples
+"top/hcwwprefix.byte": use_HardCamlFramework
+"top/hcwwprefix.byte": use_HardCamlFrameworkJS
+"top/hcwwprefix.byte": custom
 # Executable hcjsrac
 "top/hcjsrac.byte": pkg_hardcaml
 "top/hcjsrac.byte": pkg_hardcaml.js

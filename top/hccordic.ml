@@ -1,2 +1,2 @@
-module A = App.Make(HardCamlExamples.Cordic.Design)
+module A = HardCamlFrameworkConsole.App.Make(HardCamlExamples.Cordic.Design)
 

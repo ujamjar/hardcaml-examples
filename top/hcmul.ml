@@ -1,2 +1,2 @@
-module A = App.Make(HardCamlExamples.Mul.Design)
+module A = HardCamlFrameworkConsole.App.Make(HardCamlExamples.Mul.Design)
 

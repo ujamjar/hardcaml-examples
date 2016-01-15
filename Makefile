@@ -34,7 +34,7 @@ html/hcjs%.js: hcjs%.byte
 html/hcww%.js: hcww%.byte
 	js_of_ocaml +nat.js -o $@ $<
 
-WEBAPP = sort rac
+WEBAPP = sort rac lfsr cordic mul prefix
 WEBAPPJS = $(foreach core, $(WEBAPP), html/hcjs$(core).js html/hcww$(core).js) 
 
 cleanjs:

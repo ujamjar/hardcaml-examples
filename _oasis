@@ -140,6 +140,70 @@ Executable hcwwsort
   Install:            false
   BuildDepends:       hardcaml-framework.js, hardcaml-examples, js_of_ocaml, js_of_ocaml.syntax
 
+Executable hcjscordic
+  Path:               top
+  MainIs:             hcjscordic.ml
+  Custom:             true
+  CompiledObject:     byte
+  Install:            false
+  BuildDepends:       hardcaml-framework.js, hardcaml-examples, js_of_ocaml, js_of_ocaml.syntax
+
+Executable hcwwcordic
+  Path:               top
+  MainIs:             hcwwcordic.ml
+  Custom:             true
+  CompiledObject:     byte
+  Install:            false
+  BuildDepends:       hardcaml-framework.js, hardcaml-examples, js_of_ocaml, js_of_ocaml.syntax
+
+Executable hcjslfsr
+  Path:               top
+  MainIs:             hcjslfsr.ml
+  Custom:             true
+  CompiledObject:     byte
+  Install:            false
+  BuildDepends:       hardcaml-framework.js, hardcaml-examples, js_of_ocaml, js_of_ocaml.syntax
+
+Executable hcwwlfsr
+  Path:               top
+  MainIs:             hcwwlfsr.ml
+  Custom:             true
+  CompiledObject:     byte
+  Install:            false
+  BuildDepends:       hardcaml-framework.js, hardcaml-examples, js_of_ocaml, js_of_ocaml.syntax
+
+Executable hcjsmul
+  Path:               top
+  MainIs:             hcjsmul.ml
+  Custom:             true
+  CompiledObject:     byte
+  Install:            false
+  BuildDepends:       hardcaml-framework.js, hardcaml-examples, js_of_ocaml, js_of_ocaml.syntax
+
+Executable hcwwmul
+  Path:               top
+  MainIs:             hcwwmul.ml
+  Custom:             true
+  CompiledObject:     byte
+  Install:            false
+  BuildDepends:       hardcaml-framework.js, hardcaml-examples, js_of_ocaml, js_of_ocaml.syntax
+
+Executable hcjsprefix
+  Path:               top
+  MainIs:             hcjsprefix.ml
+  Custom:             true
+  CompiledObject:     byte
+  Install:            false
+  BuildDepends:       hardcaml-framework.js, hardcaml-examples, js_of_ocaml, js_of_ocaml.syntax
+
+Executable hcwwprefix
+  Path:               top
+  MainIs:             hcwwprefix.ml
+  Custom:             true
+  CompiledObject:     byte
+  Install:            false
+  BuildDepends:       hardcaml-framework.js, hardcaml-examples, js_of_ocaml, js_of_ocaml.syntax
+
 Executable hcjsrac
   Path:               top
   MainIs:             hcjsrac.ml
