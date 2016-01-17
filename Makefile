@@ -17,6 +17,7 @@ install: all
 
 uninstall: 
 	ocamlfind remove hardcaml-examples
+	ocamlfind remove hardcaml-framework
 
 clean: cleanjs
 	ocaml setup.ml -clean

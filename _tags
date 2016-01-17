@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: 3b47ce116bd7ac9e4bfd99c1e190b1bd)
+# DO NOT EDIT (digest: fb784701213bcac06064c9e92c9afc07)
 # Ignore VCS directories, you can use the same kind of rule outside
 # OASIS_START/STOP if you want to exclude directories that contains
 # useless stuff for the build process
@@ -33,6 +33,7 @@ true: annot, bin_annot
 <examples/*.ml{,i,y}>: use_HardCamlFramework
 # Library HardCamlFrameworkConsole
 "console/HardCamlFrameworkConsole.cmxs": use_HardCamlFrameworkConsole
+"console/omd_term.cmx": for-pack(HardCamlFrameworkConsole)
 "console/app.cmx": for-pack(HardCamlFrameworkConsole)
 <console/*.ml{,i,y}>: pkg_hardcaml
 <console/*.ml{,i,y}>: pkg_hardcaml-waveterm.lterm

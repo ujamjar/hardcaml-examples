@@ -45,7 +45,7 @@ Library HardCamlFrameworkConsole
   Findlibname:   console
   FindlibParent: HardCamlFramework
   Pack:          true
-  Modules:       App
+  Modules:       Omd_term, App
   BuildDepends:  hardcaml.dynlink, hardcaml-framework, hardcaml-waveterm.lterm, omd, str
   XMETARequires: hardcaml.dynlink, hardcaml-framework, hardcaml-waveterm.lterm, omd, str
 
