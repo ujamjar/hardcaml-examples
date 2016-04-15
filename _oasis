@@ -51,7 +51,7 @@ Library HardCamlFrameworkConsole
 
 Flag js
   Description: Build javascript frontend
-  Default: true
+  Default: false
 
 Library HardCamlFrameworkJS
   Build$:        flag(js)
@@ -126,6 +126,7 @@ Executable hccordic
 
 Executable hcjssort
   Path:               top
+  Build$:        flag(js)
   MainIs:             hcjssort.ml
   Custom:             true
   CompiledObject:     byte
@@ -134,6 +135,7 @@ Executable hcjssort
 
 Executable hcwwsort
   Path:               top
+  Build$:        flag(js)
   MainIs:             hcwwsort.ml
   Custom:             true
   CompiledObject:     byte
@@ -142,6 +144,7 @@ Executable hcwwsort
 
 Executable hcjscordic
   Path:               top
+  Build$:        flag(js)
   MainIs:             hcjscordic.ml
   Custom:             true
   CompiledObject:     byte
@@ -150,6 +153,7 @@ Executable hcjscordic
 
 Executable hcwwcordic
   Path:               top
+  Build$:        flag(js)
   MainIs:             hcwwcordic.ml
   Custom:             true
   CompiledObject:     byte
@@ -158,6 +162,7 @@ Executable hcwwcordic
 
 Executable hcjslfsr
   Path:               top
+  Build$:        flag(js)
   MainIs:             hcjslfsr.ml
   Custom:             true
   CompiledObject:     byte
@@ -166,6 +171,7 @@ Executable hcjslfsr
 
 Executable hcwwlfsr
   Path:               top
+  Build$:        flag(js)
   MainIs:             hcwwlfsr.ml
   Custom:             true
   CompiledObject:     byte
@@ -174,6 +180,7 @@ Executable hcwwlfsr
 
 Executable hcjsmul
   Path:               top
+  Build$:        flag(js)
   MainIs:             hcjsmul.ml
   Custom:             true
   CompiledObject:     byte
@@ -182,6 +189,7 @@ Executable hcjsmul
 
 Executable hcwwmul
   Path:               top
+  Build$:        flag(js)
   MainIs:             hcwwmul.ml
   Custom:             true
   CompiledObject:     byte
@@ -190,6 +198,7 @@ Executable hcwwmul
 
 Executable hcjsprefix
   Path:               top
+  Build$:        flag(js)
   MainIs:             hcjsprefix.ml
   Custom:             true
   CompiledObject:     byte
@@ -198,6 +207,7 @@ Executable hcjsprefix
 
 Executable hcwwprefix
   Path:               top
+  Build$:        flag(js)
   MainIs:             hcwwprefix.ml
   Custom:             true
   CompiledObject:     byte
@@ -206,6 +216,7 @@ Executable hcwwprefix
 
 Executable hcjsrac
   Path:               top
+  Build$:        flag(js)
   MainIs:             hcjsrac.ml
   Custom:             true
   CompiledObject:     byte
@@ -214,6 +225,7 @@ Executable hcjsrac
 
 Executable hcwwrac
   Path:               top
+  Build$:        flag(js)
   MainIs:             hcwwrac.ml
   Custom:             true
   CompiledObject:     byte

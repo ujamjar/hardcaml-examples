@@ -485,7 +485,8 @@ module Design = struct
       i.enable := B.gnd;
       Sim.cycle sim
 
-    let tb = 
+    let tb : B.t HardCaml.Cyclesim.Api.cyclesim -> (* 4.03.0-beta2 compat *)
+             B.t ref I.t -> B.t ref O.t -> B.t ref O.t -> unit = 
       match arch with
       | "comb" -> tb_comb
       | "pipe" -> tb_pipe
