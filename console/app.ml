@@ -58,13 +58,13 @@ end
 
 module Make(D : Design) = struct
 
-  (*module B = Bits_ext.Comb.BigarraybitsNativeint*)
-  module B = Bits_ext.Comb.ArraybitsNativeint
-  (*module B = Bits_ext.Comb.IntbitsList*)
+  (*module B = Bits.Ext.Comb.BigarraybitsNativeint*)
+  module B = Bits.Ext.Comb.ArraybitsNativeint
+  (*module B = Bits.Ext.Comb.IntbitsList*)
 
+  module Gtkwave = Vcd.Gtkwave(B)
   module Vcd = Vcd.Make(B)
-  module Gtkwave = Vcd_ext.Make(B)
-  module ISim = Cyclesim_ext.Interactive(B)
+  module ISim = Cyclesim.Interactive(B)
   module Waveterm_waves = HardCamlWaveTerm.Wave.Make(HardCamlWaveTerm.Wave.Bits(B))
   module Waveterm_sim = HardCamlWaveTerm.Sim.Make(B)(Waveterm_waves)
   module Waveterm_ui = HardCamlWaveLTerm.Ui.Make(B)(Waveterm_waves)
@@ -187,7 +187,7 @@ module Make(D : Design) = struct
 
   let () = write (get_string std_params.vlog) Rtl.Verilog.write
   let () = write (get_string std_params.vhdl) Rtl.Vhdl.write
-  let () = write (get_string std_params.csim) C.write
+  let () = write (get_string std_params.csim) Rtl.C.write
 
   (* run testbench *)
   let out_file_fn name = 

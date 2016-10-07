@@ -144,7 +144,7 @@ module Design = struct
 
   module Tb_config = struct
     include interface cycles end
-    let params = C.({ cycles = Int 32, "Number of cycles to test" })
+    let params = { cycles = Int 32, "Number of cycles to test" }
   end
 
   let validate hw tb = 
