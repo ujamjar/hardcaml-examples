@@ -18,6 +18,8 @@
   track tab alignment for things like code and quote.  
 
 *)
+
+open Astring
 open Omd_representation
 open Omd_utils
 
@@ -37,7 +39,7 @@ let style b s =
   else
     Buffer.add_string b @@ 
     "\x1b[" ^ 
-      String.concat ";" (List.map (function
+      String.concat ~sep:";" (List.map (function
         | `bold -> "1"
         | `italic -> "3"
         | `underline -> "4"
@@ -68,7 +70,7 @@ let text_of_md md =
     let loop = loop sty in
     (* heading *)
     let h n md tl = 
-      Buffer.add_string b (Bytes.init n (fun _ -> '#'));
+      Buffer.add_string b (String.v ~len:n (fun _ -> '#'));
       Buffer.add_char b ' ';
       stylish [`reverse] md;
       loop tl

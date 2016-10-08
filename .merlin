@@ -6,4 +6,6 @@ B _build/**
 PKG hardcaml
 PKG lwt
 PKG omd
+PKG hardcaml-waveterm
+PKG topkg
 EXT lwt

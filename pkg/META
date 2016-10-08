@@ -1,5 +1,3 @@
-# OASIS_START
-# DO NOT EDIT (digest: 05383e10ae4c462a0fa759e28b3b11fb)
 version = "0.2"
 description = "HardCaml Examples"
 requires = "hardcaml"
@@ -8,6 +6,16 @@ archive(byte, plugin) = "HardCamlFramework.cma"
 archive(native) = "HardCamlFramework.cmxa"
 archive(native, plugin) = "HardCamlFramework.cmxs"
 exists_if = "HardCamlFramework.cma"
+
+version = "0.2"
+description = "HardCaml Examples"
+requires = "hardcaml-framework"
+archive(byte) = "HardCamlExamples.cma"
+rchive(byte, plugin) = "HardCamlExamples.cma"
+archive(native) = "HardCamlExamples.cmxa"
+archive(native, plugin) = "HardCamlExamples.cmxs"
+exists_if = "HardCamlExamples.cma"
+
 package "js" (
  version = "0.2"
  description = "HardCaml Examples"
@@ -30,5 +38,3 @@ package "console" (
  archive(native, plugin) = "HardCamlFrameworkConsole.cmxs"
  exists_if = "HardCamlFrameworkConsole.cma"
 )
-# OASIS_STOP
-
