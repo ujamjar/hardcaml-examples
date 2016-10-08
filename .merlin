@@ -8,4 +8,5 @@ PKG lwt
 PKG omd
 PKG hardcaml-waveterm
 PKG topkg
+PKG js_of_ocaml
 EXT lwt

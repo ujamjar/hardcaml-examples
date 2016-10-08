@@ -4,6 +4,7 @@
 
 "examples": include
 <examples/*>: syntax(camlp4o), package(hardcaml), package(hardcaml.syntax)
+<examples/*.cmx> and not "examples/HardCamlExamples.cmx": for-pack(HardCamlExamples)
 
 "console": include
 <console/*.ml{,i}>: syntax(camlp4o), package(hardcaml), package(hardcaml.syntax), package(str), package(omd), package(hardcaml-waveterm), package(lwt)
@@ -12,6 +13,10 @@
 "js": include
 <js/*.ml{,i}>: syntax(camlp4o), package(hardcaml), package(hardcaml.syntax), package(hardcaml.js), package(omd), package(str), package(js_of_ocaml), package(js_of_ocaml.syntax)
 <js/*.cmx> and not "js/HardCamlFrameworkJS.cmx": for-pack(HardCamlFrameworkJS)
+
+<hcww_*.byte> or <hcjs_*.byte>: package(hardcaml), package(js_of_ocaml), package(hardcaml.js), package(omd)
+
+<hc_*.native>: package(astring), package(hardcaml), package(hardcaml-waveterm), package(hardcaml.dynlink), package(str), package(omd)
 
 true: bin_annot, safe_string
 

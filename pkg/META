@@ -7,19 +7,11 @@ archive(native) = "HardCamlFramework.cmxa"
 archive(native, plugin) = "HardCamlFramework.cmxs"
 exists_if = "HardCamlFramework.cma"
 
-version = "0.2"
-description = "HardCaml Examples"
-requires = "hardcaml-framework"
-archive(byte) = "HardCamlExamples.cma"
-rchive(byte, plugin) = "HardCamlExamples.cma"
-archive(native) = "HardCamlExamples.cmxa"
-archive(native, plugin) = "HardCamlExamples.cmxs"
-exists_if = "HardCamlExamples.cma"
 
 package "js" (
  version = "0.2"
  description = "HardCaml Examples"
- requires = "hardcaml-examples hardcaml.js omd str js_of_ocaml"
+ requires = "hardcaml-framework hardcaml.js omd str js_of_ocaml"
  archive(byte) = "HardCamlFrameworkJS.cma"
  archive(byte, plugin) = "HardCamlFrameworkJS.cma"
  archive(native) = "HardCamlFrameworkJS.cmxa"
@@ -37,4 +29,15 @@ package "console" (
  archive(native) = "HardCamlFrameworkConsole.cmxa"
  archive(native, plugin) = "HardCamlFrameworkConsole.cmxs"
  exists_if = "HardCamlFrameworkConsole.cma"
+)
+
+package "examples" (
+ version = "0.2"
+ description = "HardCaml Examples"
+ requires = "hardcaml-framework"
+ archive(byte) = "HardCamlExamples.cma"
+ rchive(byte, plugin) = "HardCamlExamples.cma"
+ archive(native) = "HardCamlExamples.cmxa"
+ archive(native, plugin) = "HardCamlExamples.cmxs"
+ exists_if = "HardCamlExamples.cma"
 )

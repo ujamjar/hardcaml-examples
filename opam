@@ -4,17 +4,12 @@ authors: "andy.ray@ujamjar.com"
 homepage: "https://github.com/ujamjar/hardcaml-examples"
 dev-repo: "https://github.com/ujamjar/hardcaml-examples"
 bug-reports: "https://github.com/ujamjar/hardcaml-examples/issues"
-build: [ [
-  "ocaml" "pkg/pkg.ml" "build"
-    "--with-js_of_ocaml" "%{js_of_ocaml:installed}%"
-] ]
+build: [ [ "ocaml" "pkg/pkg.ml" "build" ] ]
 depends: [
   "hardcaml"
   "hardcaml-waveterm"
   "omd"
   "lwt"
-]
-depopts: [ 
   "js_of_ocaml"
 ]
 available: [ ocaml-version >= "4.01.0" ]
