@@ -14,3 +14,9 @@ depends: [
   "js_of_ocaml"
 ]
 available: [ ocaml-version >= "4.01.0" ]
+post-messages:[
+"You can use cohttp-server-lwt to try the example web-apps.
+
+$ cohttp-server-lwt `opam config var share`/hardcaml-examples
+"
+]
