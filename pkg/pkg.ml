@@ -52,11 +52,8 @@ let targets name =
     Log.on_error_msg ~use:(fun () -> [])
 
 let () = 
-  Pkg.describe "hardcaml-framework" @@ fun c ->
+  Pkg.describe "hardcaml-examples" @@ fun c ->
   Ok (
-    mlpack "framework/HardCamlFramework" @
-    mlpack "console/HardCamlFrameworkConsole" @
-    mlpack "js/HardCamlFrameworkJS" @
     mlpack "examples/HardCamlExamples"  @
     targets "apps.targets"
   )

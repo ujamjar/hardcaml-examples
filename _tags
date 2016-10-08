@@ -1,22 +1,12 @@
-"framework": include
-<framework/*>: syntax(camlp4o), package(hardcaml), package(hardcaml.syntax)
-<framework/*.cmx> and not "framework/HardCamlFramework.cmx": for-pack(HardCamlFramework)
-
 "examples": include
-<examples/*>: syntax(camlp4o), package(hardcaml), package(hardcaml.syntax)
+<examples/*>: syntax(camlp4o), package(hardcaml), package(hardcaml.syntax), package(hardcaml-framework)
 <examples/*.cmx> and not "examples/HardCamlExamples.cmx": for-pack(HardCamlExamples)
 
-"console": include
-<console/*.ml{,i}>: syntax(camlp4o), package(hardcaml), package(hardcaml.syntax), package(str), package(omd), package(hardcaml-waveterm), package(lwt)
-<console/*.cmx> and not "console/HardCamlFrameworkConsole.cmx": for-pack(HardCamlFrameworkConsole)
+<hcww_*.byte> or <hcjs_*.byte>: package(hardcaml), package(hardcaml-framework.js), package(js_of_ocaml), package(hardcaml.js), package(omd)
+<hcww_*.ml{,i}> or <hcjs_*.ml{,i}>: package(hardcaml-framework.js)
 
-"js": include
-<js/*.ml{,i}>: syntax(camlp4o), package(hardcaml), package(hardcaml.syntax), package(hardcaml.js), package(omd), package(str), package(js_of_ocaml), package(js_of_ocaml.syntax)
-<js/*.cmx> and not "js/HardCamlFrameworkJS.cmx": for-pack(HardCamlFrameworkJS)
-
-<hcww_*.byte> or <hcjs_*.byte>: package(hardcaml), package(js_of_ocaml), package(hardcaml.js), package(omd)
-
-<hc_*.native>: package(astring), package(hardcaml), package(hardcaml-waveterm), package(hardcaml.dynlink), package(str), package(omd)
+<hc_*.native>: package(astring), package(hardcaml), package(hardcaml-waveterm), package(hardcaml-framework.console), package(hardcaml.dynlink), package(str), package(omd)
+<hc_*.ml{,i}>: package(hardcaml-framework.console)
 
 true: bin_annot, safe_string
 

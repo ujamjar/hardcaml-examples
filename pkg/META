@@ -1,43 +1,8 @@
-version = "0.2"
+version = "0.3"
 description = "HardCaml Examples"
-requires = "hardcaml"
-archive(byte) = "HardCamlFramework.cma"
-archive(byte, plugin) = "HardCamlFramework.cma"
-archive(native) = "HardCamlFramework.cmxa"
-archive(native, plugin) = "HardCamlFramework.cmxs"
-exists_if = "HardCamlFramework.cma"
-
-
-package "js" (
- version = "0.2"
- description = "HardCaml Examples"
- requires = "hardcaml-framework hardcaml.js omd str js_of_ocaml"
- archive(byte) = "HardCamlFrameworkJS.cma"
- archive(byte, plugin) = "HardCamlFrameworkJS.cma"
- archive(native) = "HardCamlFrameworkJS.cmxa"
- archive(native, plugin) = "HardCamlFrameworkJS.cmxs"
- exists_if = "HardCamlFrameworkJS.cma"
-)
-
-package "console" (
- version = "0.2"
- description = "HardCaml Examples"
- requires =
- "hardcaml.dynlink hardcaml-framework hardcaml-waveterm.lterm omd str"
- archive(byte) = "HardCamlFrameworkConsole.cma"
- archive(byte, plugin) = "HardCamlFrameworkConsole.cma"
- archive(native) = "HardCamlFrameworkConsole.cmxa"
- archive(native, plugin) = "HardCamlFrameworkConsole.cmxs"
- exists_if = "HardCamlFrameworkConsole.cma"
-)
-
-package "examples" (
- version = "0.2"
- description = "HardCaml Examples"
- requires = "hardcaml-framework"
- archive(byte) = "HardCamlExamples.cma"
- rchive(byte, plugin) = "HardCamlExamples.cma"
- archive(native) = "HardCamlExamples.cmxa"
- archive(native, plugin) = "HardCamlExamples.cmxs"
- exists_if = "HardCamlExamples.cma"
-)
+requires = "hardcaml-framework"
+archive(byte) = "HardCamlExamples.cma"
+rchive(byte, plugin) = "HardCamlExamples.cma"
+archive(native) = "HardCamlExamples.cmxa"
+archive(native, plugin) = "HardCamlExamples.cmxs"
+exists_if = "HardCamlExamples.cma"

@@ -8,6 +8,7 @@ build: [ [ "ocaml" "pkg/pkg.ml" "build" ] ]
 depends: [
   "hardcaml"
   "hardcaml-waveterm"
+  "hardcaml-framework"
   "omd"
   "lwt"
   "js_of_ocaml"
