@@ -1,6 +1,6 @@
 #!/usr/bin/env ocaml
 #use "topfind"
-#require "topkg"
+#require "topkg,astring"
 open Topkg
 
 let parse contents =
@@ -24,7 +24,7 @@ let mlpack ?cond name =
   let intf modls = (* install interfaces for modules in the library - .cmti/.mli *)
     Ok (List.map 
       (fun m ->
-         let name = Fpath.(dir // Atring.String.Ascii.uncapitalize m) in
+         let name = Fpath.(dir // Astring.String.Ascii.uncapitalize m) in
            Pkg.lib ?cond ~exts:Exts.(exts [".cmti"; ".mli"]) name
       ) modls)
   in
