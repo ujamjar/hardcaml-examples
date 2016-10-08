@@ -1,5 +1,7 @@
 # HardCaml Examples
 
+[![Build Status](https://travis-ci.org/ujamjar/hardcaml-examples.svg?branch=master)](https://travis-ci.org/ujamjar/hardcaml-examples)
+
 6 example cores of varying complexity.
 
 Module  | Description 
