@@ -9,6 +9,7 @@ depends: [
   "hardcaml"
   "hardcaml-waveterm"
   "hardcaml-framework"
+  "astring"
   "omd"
   "lwt"
   "js_of_ocaml"
