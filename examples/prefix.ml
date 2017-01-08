@@ -131,7 +131,9 @@ Adder architectures which trade circuit area to reduce critical path.
 _brent-kung_ and _kogge-stone_."
 
   module Hw_config = struct
-    include interface bits network graph end
+    include struct
+      type 'a t = { bits : 'a; network : 'a; graph : 'a; }[@@deriving hardcaml]
+    end
     let params = {
       bits = Int 8, "Data width";
       network = Symbol(["serial"; "sklansky"; "brent-kung"; "kogge-stone"], "sklansky"), 
@@ -141,7 +143,9 @@ _brent-kung_ and _kogge-stone_."
   end
 
   module Tb_config = struct
-    include interface cycles end
+    include struct
+      type 'a t = { cycles : 'a; }[@@deriving hardcaml]
+    end
     let params = {
       cycles = Int 10, "Number of cycles to test";
     }
@@ -170,8 +174,12 @@ _brent-kung_ and _kogge-stone_."
     let graph = get_string H.params.graph
     let cycles = get_int T.params.cycles
 
-    module I = interface a[bits] b[bits] cin[1] end
-    module O = interface c[bits+1] end
+    module I = struct
+      type 'a t = { a : 'a[@bits bits]; b : 'a[@bits bits]; cin : 'a[@bits 1]; }[@@deriving hardcaml]
+    end
+    module O = struct
+      type 'a t = { c : 'a[@bits bits+1]; }[@@deriving hardcaml]
+    end
 
     let wave_cfg = 
       let open Display in

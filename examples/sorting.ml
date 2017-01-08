@@ -133,7 +133,7 @@ module Design = struct
   let desc = "*Bitonic* and *Odd-even* merge sorting networks."
 
   module Hw_config = struct
-    include interface bits size network pipeline end
+    type 'a t = { bits : 'a; size : 'a; network : 'a; pipeline : 'a; }[@@deriving hardcaml]
     let params = {
       bits = Int 8, "Data width";
       size = Int 8, "Size of sorting network";
@@ -143,7 +143,7 @@ module Design = struct
   end
 
   module Tb_config = struct
-    include interface cycles end
+    type 'a t = { cycles : 'a; }[@@deriving hardcaml]
     let params = { cycles = Int 32, "Number of cycles to test" }
   end
 
@@ -164,8 +164,12 @@ module Design = struct
     let pipeline = get_bool H.params.pipeline
     let cycles = get_int T.params.cycles
 
-    module I = interface d{size}[bits] end
-    module O = interface q{size}[bits] end
+    module I = struct
+      type 'a t = { d : 'a list[@length size][@bits bits]; }[@@deriving hardcaml]
+    end
+    module O = struct
+      type 'a t = { q : 'a list[@length size][@bits bits]; }[@@deriving hardcaml]
+    end
 
     let wave_cfg = 
       Some(["clock",Display.B; "clear", Display.B] @

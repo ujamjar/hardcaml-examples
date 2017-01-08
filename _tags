@@ -1,5 +1,5 @@
 "examples": include
-<examples/*>: syntax(camlp4o), package(hardcaml), package(hardcaml.syntax), package(hardcaml-framework)
+<examples/*>: package(hardcaml), package(hardcaml-framework), package(ppx_deriving_hardcaml)
 <examples/*.cmx> and not "examples/HardCamlExamples.cmx": for-pack(HardCamlExamples)
 
 <hcww_*.byte> or <hcjs_*.byte>: package(hardcaml), package(hardcaml-framework.js), package(js_of_ocaml), package(hardcaml.js), package(omd)

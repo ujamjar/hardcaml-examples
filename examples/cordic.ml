@@ -254,7 +254,9 @@ module Design = struct
      generator code.  The generic cores do support it though *)
 
   module Hw_config = struct
-    include interface arch bits fp system mode iters funct end
+    include struct
+      type 'a t = { arch : 'a; bits : 'a; fp : 'a; system : 'a; mode : 'a; iters : 'a; funct : 'a; }[@@deriving hardcaml]
+    end
     let params = {
       arch = Symbol(["comb"; "pipe"; "iter"], "comb"), "Combinatorial, pipelined or iterative architecture";
       bits = Int 20, "CORDIC data path width";
@@ -272,7 +274,9 @@ module Design = struct
   end
 
   module Tb_config = struct
-    include interface x y z c end
+    include struct
+      type 'a t = { x : 'a; y : 'a; z : 'a; c : 'a; }[@@deriving hardcaml]
+    end
     let params = {
       x = Float 0.0, "x input";
       y = Float 0.0, "y input";
@@ -306,8 +310,25 @@ module Design = struct
     let z = get_float T.params.z
     let c = get_float T.params.c
 
-    module I = interface enable[1] ld[1] system[2] mode[2] c[bits] x[bits] y[bits] z[bits] end
-    module O = interface xo[bits] yo[bits] zo[bits] end
+    module I = struct
+      type 'a t = { 
+        enable : 'a[@bits 1]; 
+        ld : 'a[@bits 1]; 
+        system : 'a[@bits 2]; 
+        mode : 'a[@bits 2]; 
+        c : 'a[@bits bits]; 
+        x : 'a[@bits bits]; 
+        y : 'a[@bits bits]; 
+        z : 'a[@bits bits]; 
+      }[@@deriving hardcaml]
+    end
+    module O = struct
+      type 'a t = { 
+        xo : 'a[@bits bits]; 
+        yo : 'a[@bits bits]; 
+        zo : 'a[@bits bits]; 
+      }[@@deriving hardcaml]
+    end
 
     let wave_cfg = 
       let open Display in

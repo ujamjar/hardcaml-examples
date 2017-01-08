@@ -109,7 +109,9 @@ module Design = struct
   let desc = "Linear Feedback Shift Register"
 
   module Hw_config = struct
-    include interface bits structure xnor counterpart end
+    include struct
+      type 'a t = { bits : 'a; structure : 'a; xnor : 'a; counterpart : 'a; }[@@deriving hardcaml]
+    end
     let params = {
       bits = Int 8, "LFSR width";
       structure = Symbol(["fibonacci"; "galois"], "fibonacci"), "LFSR structure";
@@ -119,7 +121,9 @@ module Design = struct
   end
 
   module Tb_config = struct
-    include interface cycles end
+    include struct
+      type 'a t = { cycles : 'a; }[@@deriving hardcaml]
+    end
     let params = {
       cycles = Int 10, "Number of cycles to test";
     }
@@ -142,8 +146,12 @@ module Design = struct
     let counterpt = get_bool H.params.counterpart
     let cycles = get_int T.params.cycles
 
-    module I = interface d[bits] end
-    module O = interface q[bits] end
+    module I = struct
+      type 'a t = { d : 'a[@bits bits]; }[@@deriving hardcaml]
+    end
+    module O = struct
+      type 'a t = { q : 'a[@bits bits]; }[@@deriving hardcaml]
+    end
 
     let wave_cfg = None
   

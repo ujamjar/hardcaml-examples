@@ -159,7 +159,9 @@ module Design = struct
   let desc = "**_Wallace_ and _Dadda_ tree multipliers**"
 
   module Hw_config = struct
-    include interface bits multiplier end
+    include struct
+      type 'a t = { bits : 'a; multiplier : 'a; }[@@deriving hardcaml]
+    end
     let params = {
       bits = Int 8, "Data width";
       multiplier = Symbol(["wallace"; "dadda"], "wallace"), 
@@ -168,7 +170,9 @@ module Design = struct
   end
 
   module Tb_config = struct
-    include interface cycles end
+    include struct
+      type 'a t = { cycles : 'a; }[@@deriving hardcaml]
+    end
     let params = {
       cycles = Int 10, "Number of cycles to test";
     }
@@ -187,8 +191,12 @@ module Design = struct
     let multiplier = get_string H.params.multiplier
     let cycles = get_int T.params.cycles
 
-    module I = interface da[bits] db[bits] end
-    module O = interface q[bits] end
+    module I = struct
+      type 'a t = { da : 'a[@bits bits]; db : 'a[@bits bits]; }[@@deriving hardcaml]
+    end
+    module O = struct
+      type 'a t = { q : 'a[@bits bits]; }[@@deriving hardcaml]
+    end
 
     module Mul = Make(Signal.Comb)
     let mul = 

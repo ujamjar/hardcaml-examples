@@ -100,7 +100,9 @@ Note; overflow of input values is not checked by the testbench
 and will lead to incorrect results."
   
   module Hw_config = struct
-    include interface fixed xbits coefs coefprec guard config end
+    include struct
+      type 'a t = { fixed : 'a; xbits : 'a; coefs : 'a; coefprec : 'a; guard : 'a; config : 'a; }[@@deriving hardcaml]
+    end
     let params = { 
       fixed=Flag false, "Fixed point or integer RAC";
       xbits=Int 16, "input width";
@@ -112,7 +114,9 @@ and will lead to incorrect results."
   end
 
   module Tb_config = struct
-    include interface inpprec x end
+    include struct
+      type 'a t = { inpprec : 'a; x : 'a; }[@@deriving hardcaml]
+    end
     let params = {
       inpprec=Int 4, "Input fixed point precision";
       x=Float_list [], "list of testbench input values";
@@ -242,12 +246,16 @@ and will lead to incorrect results."
       done;
     end
 
-    module I = interface
-      en[1] ld[1] addsub[1] x{|n_coefs|}[xbits]
+    module I = struct
+      type 'a t = {
+        en : 'a[@bits 1]; ld : 'a[@bits 1]; addsub : 'a[@bits 1]; x : 'a array[@length n_coefs][@bits xbits];
+      }[@@deriving hardcaml]
     end
     
-    module O = interface
-      q[accbits]
+    module O = struct
+      type 'a t = {
+        q : 'a[@bits accbits];
+      }[@@deriving hardcaml]
     end
 
     let wave_cfg = 
