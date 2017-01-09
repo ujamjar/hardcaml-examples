@@ -22,3 +22,7 @@ post-messages:[
 $ cohttp-server-lwt `opam config var share`/hardcaml-examples
 "
 ]
+name: "hardcaml-examples"
+version: "0.3.2"
+license: "ISC"
+substs:[ "pkg/META" ]
