@@ -2,13 +2,14 @@ opam-version: "1.2"
 maintainer: "andy.ray@ujamjar.com"
 authors: "andy.ray@ujamjar.com"
 homepage: "https://github.com/ujamjar/hardcaml-examples"
-dev-repo: "https://github.com/ujamjar/hardcaml-examples"
+dev-repo: "https://github.com/ujamjar/hardcaml-examples.git"
 bug-reports: "https://github.com/ujamjar/hardcaml-examples/issues"
 build: [ [ "ocaml" "pkg/pkg.ml" "build" ] ]
 depends: [
-  "hardcaml"
+  "hardcaml" { >= "1.2.0" & < "2.0.0" }
   "hardcaml-waveterm"
-  "hardcaml-framework"
+  "hardcaml-framework" { >= "0.3.0" }
+  "ppx_deriving_hardcaml" { >= "1.1.0" }
   "astring"
   "omd"
   "lwt"
