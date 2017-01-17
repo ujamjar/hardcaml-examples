@@ -124,11 +124,11 @@ module Design = struct
   open Param
 
   let name = "prefix"
-  let desc = "**Parallel prefix adder**
+  let desc = {|**Parallel prefix adder**
 
 Adder architectures which trade circuit area to reduce critical path.
 4 progressive larger/faster architectures are provided; _serial_, _sklansky_
-_brent-kung_ and _kogge-stone_."
+_brent-kung_ and _kogge-stone_.|}
 
   module Hw_config = struct
     include struct

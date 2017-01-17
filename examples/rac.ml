@@ -64,7 +64,7 @@ module Design = struct
   open Param
 
   let name = "RAC"
-  let desc = "**ROM-accumulator using distributed arithmetic**
+  let desc = {|**ROM-accumulator using distributed arithmetic**
 
 The RAC computes **a0.x0 + a1.x1 ...** for fixed **a** and variable **x**.
 
@@ -74,11 +74,11 @@ parameter; **fixed** or **integer** mode.
 *Integer mode*
 
 *-coefs* and *-x* are interpreted as integers (they are rounded if 
-required).  *-xbits* gives the 2\\`s complement width of the inputs.
+required).  *-xbits* gives the 2`s complement width of the inputs.
 Internal data path widths are calculated automatically.
 
 ```
-$ "^Sys.argv.(0)^" -coefs \"1,-1,7,-3\" -x \"-4,2,3,-6\" -tb
+$ |}^Sys.argv.(0)^{| -coefs "1,-1,7,-3" -x "-4,2,3,-6" -tb
 ```
 
 *Fixed mode*
@@ -92,12 +92,12 @@ affects how the testbench converts input and displays output values
 but not the actual hardware data path.
 
 ```
-$ "^Sys.argv.(0)^" -coefs \"0.9,0.4,-1.4,0.1\" -x \"12.4,22.1,-3.346,10.223\" 
+$ |}^Sys.argv.(0)^{| -coefs "0.9,0.4,-1.4,0.1" -x "12.4,22.1,-3.346,10.223" 
   -fixed -xbits 9 -inpprec 3 -coefprec 8 -guard 4 -tb
 ```
 
 Note; overflow of input values is not checked by the testbench
-and will lead to incorrect results."
+and will lead to incorrect results.|}
   
   module Hw_config = struct
     include struct
