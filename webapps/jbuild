@@ -1,0 +1,52 @@
+(* -*- tuareg -*- *)
+
+let example name modl = 
+"
+(executable 
+ ((name hc_"^name^")
+  (public_name hc-"^name^")
+  (modules (hc_"^name^"))
+  (libraries (hardcaml-examples hardcaml-framework.console))))
+
+(executable
+ ((name hcww_"^name^")
+  (modules (hcww_"^name^"))
+  (js_of_ocaml ((flags (+nat.js))))
+  (libraries (hardcaml-examples hardcaml-framework.js js_of_ocaml hardcaml-js omd))))
+
+(executable
+ ((name hcjs_"^name^")
+  (modules (hcjs_"^name^"))
+  (js_of_ocaml ((flags (+nat.js))))
+  (libraries (hardcaml-examples hardcaml-framework.js js_of_ocaml hardcaml-js omd))))
+
+(rule
+ ((targets (hc_"^name^".ml))
+  (action (with-stdout-to hc_"^name^".ml (echo 
+    \"module A = HardCamlFrameworkConsole.App.Make(HardCamlExamples."^modl^".Design)\")))))
+
+(rule
+ ((targets (hcww_"^name^".ml))
+  (action (with-stdout-to hcww_"^name^".ml (echo 
+    \"module A = HardCamlFrameworkJS.Appww.Make(HardCamlExamples."^modl^".Design)\")))))
+
+(rule
+ ((targets (hcjs_"^name^".ml))
+  (action (with-stdout-to hcjs_"^name^".ml (echo 
+    \"module A = HardCamlFrameworkJS.Appmain.Make(HardCamlExamples."^modl^".Design)\")))))
+
+(install
+ ((section share)
+  (files ((hcww_"^name^".bc.js as hcww_"^name^".js) (hcjs_"^name^".bc.js as hcjs_"^name^".js)))))
+"
+
+let () = 
+  let jbuild = String.concat "\n" [
+    (example "cordic" "Cordic");
+    (example "lfsr" "Lfsr");
+    (example "mul" "Mul");
+    (example "prefix" "Prefix");
+    (example "rac" "Rac");
+    (example "sorting" "Sorting")
+  ] in
+  Jbuild_plugin.V1.send jbuild

@@ -4,3 +4,5 @@ _build/
 HardCamlExamples.docdir
 *.byte
 *.native
+.merlin
+*.install

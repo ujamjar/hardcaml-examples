@@ -3,11 +3,10 @@
 all: build
 
 build:
-	cp pkg/META.in pkg/META
-	ocaml pkg/pkg.ml build
+	jbuilder build @install
 
 clean: 
-	ocaml pkg/pkg.ml clean
+	rm -rf _build
 	find . -name "*~" | xargs rm -f
 
 VERSION      := $$(opam query --version)

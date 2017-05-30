@@ -1,0 +1,11 @@
+(install
+ ((section share)
+  (files (
+    cordic.html 
+    lfsr.html
+    mul.html
+    prefix.html
+    rac.html
+    sorting.html
+  ))))
+
