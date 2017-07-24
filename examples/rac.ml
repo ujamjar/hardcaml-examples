@@ -274,7 +274,7 @@ and will lead to incorrect results.|}
             ~romcoefs:romcoefs ~x:(Array.to_list i.x))
       }
 
-    let tb sim i o _ = 
+    let tb sim i o n = 
       let open I in
       let open O in
       let module S = Cyclesim.Api in
@@ -293,7 +293,9 @@ and will lead to incorrect results.|}
         S.cycle sim;
         i.addsub := B.gnd
       done;
-      let q = float_of_int (B.to_sint !(o.q)) /. (2. ** float_of_int outprec) in
+      let q = float_of_int (B.to_sint !(n.q)) /. (2. ** float_of_int outprec) in
+      S.cycle sim;
+      S.cycle sim;
       Printf.printf "expected=%f got=%f\n" eval q
 
   end
