@@ -2,4 +2,4 @@
  ((name HardCamlExamples)
   (public_name hardcaml-examples)
   (libraries (hardcaml hardcaml-framework))
-  (preprocess (pps (ppx_deriving_omp ppx_deriving_hardcaml)))))
+  (preprocess (pps (ppx_deriving_hardcaml)))))
